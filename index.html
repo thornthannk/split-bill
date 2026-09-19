@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Split Bill Dashboard</title>
+<style>
+  :root{
+    --bg:#f2f2f2;
+    --card:#ffffff;
+    --border:#dcdcdc;
+    --text:#1c1c1c;
+    --muted:#707070;
+    --accent:#1f1f1f;
+    --accent-soft:#ececec;
+    --chip-light:#ececec;
+    --chip-dark:#c9c9c9;
+    --green:#1f9d55;
+    --green-soft:#e6f7ec;
+    --red:#e0433d;
+    --red-soft:#fdeceb;
+    --radius:12px;
+    --shadow:0 1px 2px rgba(0,0,0,.04), 0 1px 3px rgba(0,0,0,.06);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding:32px 24px 80px;
+  }
+  .wrap{max-width:1220px;margin:0 auto;}
+  header.top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:24px;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  header.top h1{
+    font-size:24px;
+    margin:0;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  header.top p{margin:4px 0 0;color:var(--muted);font-size:13.5px;}
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:20px 22px;
+    margin-bottom:20px;
+  }
+  .card h2{
+    font-size:15px;
+    margin:0 0 14px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:var(--text);
+  }
+  .settings-row{
+    display:flex;
+    gap:28px;
+    flex-wrap:wrap;
+  }
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .field label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.03em;}
+  .field .input-suffix{
+    display:flex;align-items:center;
+    border:1px solid var(--border);
+    border-radius:8px;
+    overflow:hidden;
+    width:120px;
+  }
+  .field input{
+    border:none;
+    outline:none;
+    padding:8px 10px;
+    font-size:14px;
+    width:100%;
+    color:var(--text);
+  }
+  .field .suffix{
+    padding:0 10px;
+    background:#f7f7f7;
+    color:var(--muted);
+    font-size:13px;
+    border-left:1px solid var(--border);
+  }
+  .table-scroll{overflow-x:auto;border-radius:10px;}
+  table{
+    border-collapse:collapse;
+    width:100%;
+    min-width:780px;
+    font-size:13.5px;
+  }
+  thead th{
+    background:var(--accent);
+    color:#ffffff;
+    font-weight:600;
+    font-size:11.5px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    padding:10px 10px;
+    border-bottom:1px solid var(--border);
+    text-align:left;
+    white-space:nowrap;
+  }
+  thead th.member-col{text-align:center;}
+  tbody td{
+    padding:6px 8px;
+    border-bottom:1px solid var(--border);
+    vertical-align:middle;
+  }
+  tbody tr:hover{background:#fafafa;}
+  td.member-col, th.member-col{text-align:center;}
+  /* Plain, clean number & text inputs everywhere — no native browser arrows */
+  td input[type="text"], td input[type="number"]{
+    border:1px solid transparent;
+    background:transparent;
+    padding:6px 7px;
+    border-radius:6px;
+    font-size:13.5px;
+    width:100%;
+    color:var(--text);
+  }
+  td input[type="number"]{width:90px;}
+  td input.item-disc-value{width:66px;}
+  td input.item-disc-value.has-discount{color:var(--red);font-weight:600;}
+  td select.item-disc-type{
+    border:1px solid transparent;
+    background:transparent;
+    padding:6px 4px;
+    border-radius:6px;
+    font-size:13px;
+    width:60px;
+    color:var(--text);
+    cursor:pointer;
+  }
+  td select.item-disc-type:hover, td select.item-disc-type:focus{
+    border:1px solid var(--border);
+    background:#fff;
+    outline:none;
+  }
+  td select.item-disc-type:focus{border-color:var(--accent);}
+  td input[type="text"]:hover, td input[type="number"]:hover,
+  td input[type="text"]:focus, td input[type="number"]:focus{
+    border:1px solid var(--border);
+    background:#fff;
+    outline:none;
+  }
+  td input[type="text"]:focus, td input[type="number"]:focus{
+    border-color:var(--accent);
+  }
+  /* Hide native up/down spinner arrows globally so all number fields are
+     plain type-in boxes (no arrows anywhere on Qty / Cost / Paid Amount). */
+  input[type="number"]{ -moz-appearance:textfield; }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button{
+    -webkit-appearance:none;
+    margin:0;
+  }
+  input[type="checkbox"]{
+    width:17px;height:17px;
+    accent-color:var(--accent);
+    cursor:pointer;
+  }
+  .readonly-val{
+    padding:6px 7px;
+    color:var(--muted);
+    white-space:nowrap;
+  }
+  .discount-val{color:var(--muted);}
+  .discount-val.has-discount, .total-discount-val.has-discount{color:var(--red);}
+  .member-name-input{
+    text-align:center;
+    font-weight:600;
+    width:88px !important;
+  }
+  .remove-member-btn{
+    display:block;
+    margin:4px auto 0;
+    border:none;
+    background:none;
+    color:var(--red);
+    font-size:11px;
+    cursor:pointer;
+    opacity:.65;
+  }
+  .remove-member-btn:hover{opacity:1;text-decoration:underline;}
+  .icon-btn{
+    border:none;
+    background:none;
+    cursor:pointer;
+    color:var(--muted);
+    font-size:16px;
+    padding:4px 8px;
+    border-radius:6px;
+    line-height:1;
+  }
+  .icon-btn:hover{background:var(--chip-dark);color:var(--text);}
+  tfoot td{
+    padding:10px 8px;
+    font-weight:700;
+    border-top:2px solid var(--accent);
+    background:var(--accent-soft);
+  }
+  .btn{
+    border:1px solid var(--border);
+    background:#fff;
+    color:var(--text);
+    padding:8px 14px;
+    border-radius:8px;
+    font-size:13.5px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    transition:.15s;
+  }
+  .btn:hover{border-color:var(--accent);color:var(--text);background:#f5f5f5;}
+  .btn.primary{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  .btn.primary:hover{background:#000;color:#fff;}
+  .toolbar{
+    display:flex;
+    gap:10px;
+    margin-top:16px;
+    flex-wrap:wrap;
+  }
+  .summary-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:14px;
+  }
+  .summary-card{
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px 16px;
+    background:#fff;
+    position:relative;
+  }
+  .summary-card .name{font-weight:700;font-size:14.5px;margin-bottom:4px;}
+  .summary-card .amount{font-size:20px;font-weight:700;color:var(--text);}
+  .summary-card .status{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    font-size:12px;
+    margin-top:8px;
+    padding:3px 10px;
+    border-radius:20px;
+    cursor:pointer;
+    user-select:none;
+    font-weight:600;
+  }
+  .status.paid{background:var(--accent);color:#fff;}
+  .status.unpaid{background:#fff;color:var(--muted);border:1px solid var(--border);}
+  .note{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:10px;
+    font-style:italic;
+  }
+  .grand-total{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding-top:10px;
+    margin-top:6px;
+    border-top:1px dashed var(--border);
+    font-size:13.5px;
+    color:var(--muted);
+  }
+  .grand-total b{color:var(--text);font-size:16px;}
+  .balance-val{font-weight:700;padding:3px 9px;border-radius:6px;white-space:nowrap;}
+  .balance-val.positive{color:var(--green);background:var(--green-soft);}
+  .balance-val.negative{color:var(--red);background:var(--red-soft);}
+  .balance-val.zero{color:var(--muted);background:transparent;}
+  .settle-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 14px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    margin-bottom:8px;
+    background:#fafafa;
+    flex-wrap:wrap;
+  }
+  .settle-row .settle-from{font-weight:700;color:var(--red);}
+  .settle-row .settle-to{font-weight:700;color:var(--green);}
+  .settle-row .settle-arrow{color:var(--muted);font-size:15px;}
+  .settle-row .settle-amount{
+    margin-left:auto;
+    font-weight:700;
+    color:var(--text);
+    font-size:14.5px;
+    background:var(--chip-light);
+    padding:3px 10px;
+    border-radius:6px;
+  }
+  .all-settled{
+    padding:14px;
+    text-align:center;
+    color:var(--text);
+    font-weight:600;
+    background:var(--chip-light);
+    border-radius:10px;
+  }
+  .settle-top-line{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    width:100%;
+  }
+  .settle-bank-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    width:100%;
+    margin-top:8px;
+    padding-top:8px;
+    border-top:1px dashed var(--border);
+    flex-wrap:wrap;
+  }
+  .settle-bank-row label{
+    font-size:11.5px;
+    color:var(--muted);
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:.02em;
+  }
+  .bank-select{
+    border:1px solid var(--border);
+    border-radius:7px;
+    padding:6px 8px;
+    font-size:13px;
+    background:#fff;
+    color:var(--text);
+    min-width:170px;
+  }
+  .bank-select:focus{outline:none;border-color:var(--accent);}
+  .acc-number-input{
+    border:1px solid var(--border);
+    border-radius:7px;
+    padding:6px 9px;
+    font-size:13px;
+    background:#fff;
+    color:var(--text);
+    width:170px;
+    letter-spacing:.02em;
+  }
+  .acc-number-input:focus{outline:none;border-color:var(--accent);}
+  .acc-number-input::placeholder{color:#bdbdbd;}
+  .acc-number-wrap{
+    display:flex;
+    align-items:stretch;
+    gap:0;
+  }
+  .acc-number-wrap .acc-number-input{
+    border-radius:7px 0 0 7px;
+    border-right:none;
+  }
+  .copy-acc-btn{
+    border:1px solid var(--border);
+    border-left:none;
+    border-radius:0 7px 7px 0;
+    background:var(--accent-soft);
+    color:var(--text);
+    cursor:pointer;
+    padding:0 10px;
+    font-size:13px;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    transition:.15s;
+    white-space:nowrap;
+  }
+  .copy-acc-btn:hover{background:var(--accent);color:#fff;}
+  .copy-acc-btn.copied{background:var(--text);color:#fff;border-color:var(--text);}
+  .promptpay-badge{
+    display:inline-block;
+    font-size:11px;
+    font-weight:700;
+    color:var(--text);
+    background:var(--chip-light);
+    padding:2px 7px;
+    border-radius:6px;
+    margin-left:6px;
+  }
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:12px;
+    margin-top:28px;
+  }
+  @media (max-width:640px){
+    body{padding:18px 12px 60px;}
+    .card{padding:16px;}
+  }
+  /* ---- View-only banner (only present in the shared snapshot file) ---- */
+  .view-only-banner{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--accent-soft);
+    color:var(--text);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:10px 14px;
+    font-size:13px;
+    font-weight:600;
+    margin-bottom:20px;
+  }
+  .view-only .member-col input[type="checkbox"]{
+    pointer-events:none;
+  }
+  .view-only .status{cursor:default;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>🧾 Split Bill Dashboard</h1>
+      <p>Add items, add people, tick who shared what — totals update automatically.</p>
+    </div>
+    <div class="toolbar">
+      <button class="btn primary" id="shareViewBtn">🔗 Share (View Only)</button>
+      <button class="btn" id="resetBtn">↺ Reset to sample</button>
+      <button class="btn" id="clearBtn">🗑 Clear all</button>
+    </div>
+  </header>
+
+  <div class="card">
+    <h2>⚙️ Charges</h2>
+    <div class="settings-row">
+      <div class="field">
+        <label>Service Charge</label>
+        <div class="input-suffix">
+          <input type="number" id="scPercent" step="0.1" min="0">
+          <span class="suffix">%</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>VAT</label>
+        <div class="input-suffix">
+          <input type="number" id="vatPercent" step="0.1" min="0">
+          <span class="suffix">%</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Currency Symbol</label>
+        <div class="input-suffix" style="width:90px">
+          <input type="text" id="currencySymbol" maxlength="3">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🍽️ Menu &amp; Split</h2>
+    <div class="table-scroll">
+      <table id="billTable">
+        <thead>
+          <tr id="headerRow">
+            <th style="min-width:140px;">Menu</th>
+            <th style="min-width:70px;">Qty</th>
+            <th>Cost w/o SC &amp; VAT</th>
+            <th style="min-width:70px;">Disc. Value</th>
+            <th style="min-width:65px;">Disc. Type</th>
+            <th>Discount</th>
+            <th>Cost w/ SC</th>
+            <th>Cost w/ VAT</th>
+            <!-- member columns injected here -->
+            <th style="min-width:90px;">Cost/Head</th>
+            <th style="width:36px;"></th>
+          </tr>
+        </thead>
+        <tbody id="itemsBody"></tbody>
+        <tfoot id="tableFoot"></tfoot>
+      </table>
+    </div>
+    <div class="toolbar">
+      <button class="btn primary" id="addItemBtn">+ Add Item</button>
+      <button class="btn" id="addMemberBtn">+ Add Person</button>
+    </div>
+    <div class="note">* Discount can be set per item — leave it at 0 for items with no discount. Choose "%" to discount that item by a percentage, or "฿ Fixed" to knock a flat baht amount off just that item. Discount is applied before Service Charge and VAT. Cost/Head splits that item's Cost w/ VAT evenly across everyone checked in that row.</div>
+  </div>
+
+  <div class="card">
+    <h2>👥 Who Owes What</h2>
+    <div class="summary-grid" id="summaryGrid"></div>
+    <div class="grand-total">
+      <span>Grand Total (all items, incl. discount + SC + VAT)</span>
+      <b id="grandTotal">฿0.00</b>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>💵 Who Paid First</h2>
+    <div class="table-scroll">
+      <table id="paidTable">
+        <thead>
+          <tr>
+            <th style="min-width:120px;">Person</th>
+            <th style="min-width:140px;">Amount Paid Upfront</th>
+            <th>Their Share</th>
+            <th>Balance</th>
+          </tr>
+        </thead>
+        <tbody id="paidBody"></tbody>
+      </table>
+    </div>
+    <div class="note">Enter how much each person actually paid at the restaurant (e.g. whoever paid the bill by card). Balance = Amount Paid − Their Share: ▲ means they should get money back, ▼ means they still owe.</div>
+  </div>
+
+  <div class="card">
+    <h2>🔄 Settle Up — Who Transfers to Whom</h2>
+    <div id="settleList"></div>
+  </div>
+
+  <footer>Split Bill Dashboard · edits are saved automatically in this browser</footer>
+</div>
+
+<script>
+const STORAGE_KEY = "splitBillDashboardState_v5";
+
+// Commercial + state-owned banks operating in Thailand, used for the
+// "Settle Up" bank-account dropdown (source: Bank of Thailand FI list).
+const PAYMENT_METHODS = [
+  "พร้อมเพย์ (PromptPay)"
+];
+const THAI_BANKS = [
+  "ธนาคารกรุงเทพ (Bangkok Bank)",
+  "ธนาคารกสิกรไทย (Kasikornbank)",
+  "ธนาคารกรุงไทย (Krungthai Bank)",
+  "ธนาคารทหารไทยธนชาต (ttb)",
+  "ธนาคารไทยพาณิชย์ (SCB)",
+  "ธนาคารกรุงศรีอยุธยา (Krungsri)",
+  "ธนาคารเกียรตินาคินภัทร (KKP)",
+  "ธนาคารซีไอเอ็มบี ไทย (CIMB Thai)",
+  "ธนาคารทิสโก้ (TISCO)",
+  "ธนาคารยูโอบี (UOB)",
+  "ธนาคารไทยเครดิต (Thai Credit Bank)",
+  "ธนาคารแลนด์ แอนด์ เฮ้าส์ (LH Bank)",
+  "ธนาคารไอซีบีซี (ไทย) (ICBC Thai)",
+  "ธนาคารออมสิน (GSB)",
+  "ธนาคารอาคารสงเคราะห์ (GH Bank)",
+  "ธนาคารเพื่อการเกษตรและสหกรณ์การเกษตร (BAAC)",
+  "ธนาคารเพื่อการส่งออกและนำเข้าแห่งประเทศไทย (EXIM Bank)",
+  "ธนาคารพัฒนาวิสาหกิจขนาดกลางและขนาดย่อมแห่งประเทศไทย (SME Bank)",
+  "ธนาคารอิสลามแห่งประเทศไทย (iBank)",
+  "ธนาคารซิตี้แบงก์ (Citibank)",
+  "ธนาคารสแตนดาร์ดชาร์เตอร์ด (Standard Chartered)"
+];
+
+function round2(n){ return Math.round((Number(n)||0) * 100) / 100; }
+
+function buildSample(){
+  const scPercent = 10, vatPercent = 7, currencySymbol = "฿";
+  const items = [
+    { name: "Regency",      qty: 1, cost: 1350, consumed: [true, true, true], discountType: "percent", discountValue: 0 },
+    { name: "Soda",         qty: 3, cost: 180,  consumed: [true, true, true], discountType: "percent", discountValue: 0 },
+    { name: "Water",        qty: 3, cost: 180,  consumed: [true, true, true], discountType: "percent", discountValue: 0 },
+    { name: "Ice",          qty: 1, cost: 100,  consumed: [true, true, true], discountType: "percent", discountValue: 0 },
+    { name: "Coke",         qty: 1, cost: 60,   consumed: [true, true, true], discountType: "percent", discountValue: 0 },
+    { name: "ยำวุ้นเส้น",    qty: 1, cost: 220,  consumed: [true, false, false], discountType: "percent", discountValue: 0 }
+  ];
+  const members = ["Bom", "Tae", "Whaa"];
+  // Demo default: assume the first person on the list paid the whole bill
+  // upfront (e.g. paid by card), so the Settle Up section has something
+  // meaningful to show out of the box.
+  const totalVAT = items.reduce((s, item) => {
+    const costSC = item.cost * (1 + scPercent / 100);
+    const costVAT = costSC * (1 + vatPercent / 100);
+    return s + costVAT;
+  }, 0);
+  return {
+    scPercent, vatPercent, currencySymbol, members, items,
+    paid: members.map(() => false),
+    paidAmounts: members.map((m, i) => i === 0 ? round2(totalVAT) : 0),
+    bankNames: members.map((m, i) => i === 0 ? THAI_BANKS[1] : ""),
+    bankAccounts: members.map((m, i) => i === 0 ? "123-4-56789-0" : "")
+  };
+}
+
+let state = loadState() || buildSample();
+normalizeState();
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+    if(!parsed.members || !parsed.items) return null;
+    return parsed;
+  }catch(e){ return null; }
+}
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+function normalizeState(){
+  // Backfill fields for state saved by older versions of this dashboard.
+  if(!Array.isArray(state.paid)) state.paid = state.members.map(() => false);
+  if(!Array.isArray(state.paidAmounts)) state.paidAmounts = state.members.map(() => 0);
+  if(!Array.isArray(state.bankNames)) state.bankNames = state.members.map(() => "");
+  if(!Array.isArray(state.bankAccounts)) state.bankAccounts = state.members.map(() => "");
+  while(state.paid.length < state.members.length) state.paid.push(false);
+  while(state.paidAmounts.length < state.members.length) state.paidAmounts.push(0);
+  while(state.bankNames.length < state.members.length) state.bankNames.push("");
+  while(state.bankAccounts.length < state.members.length) state.bankAccounts.push("");
+  state.items.forEach(item => {
+    if(!Array.isArray(item.consumed)) item.consumed = state.members.map(() => false);
+    while(item.consumed.length < state.members.length) item.consumed.push(false);
+    // Backfill per-item discount fields for items saved by older versions
+    // of this dashboard (which only had a single global discount).
+    if(item.discountType !== "percent" && item.discountType !== "amount") item.discountType = "percent";
+    if(typeof item.discountValue !== "number" || isNaN(item.discountValue)) item.discountValue = 0;
+  });
+}
+function fmt(n){
+  if(isNaN(n)) n = 0;
+  return state.currencySymbol + Number(n).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function getItemDiscount(item){
+  const dVal = Number(item.discountValue||0);
+  if(dVal <= 0) return 0;
+  const cost = Number(item.cost||0);
+  if(item.discountType === "amount"){
+    return Math.min(cost, dVal);
+  }
+  // percent (default)
+  return Math.min(cost, cost * (dVal/100));
+}
+function calcRow(item){
+  const discount = getItemDiscount(item);
+  const netCost = Math.max(0, Number(item.cost||0) - discount);
+  const costSC = netCost * (1 + Number(state.scPercent||0)/100);
+  const costVAT = costSC * (1 + Number(state.vatPercent||0)/100);
+  const consumedCount = item.consumed.filter(Boolean).length;
+  const perHead = consumedCount > 0 ? costVAT / consumedCount : 0;
+  return { discount, netCost, costSC, costVAT, perHead };
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function escapeAttr(s){ return escapeHtml(s); }
+
+/* ---------- Focus preservation (belt & suspenders for structural rebuilds) ---------- */
+function captureFocus(){
+  const active = document.activeElement;
+  if(!active || (active.tagName !== "INPUT" && active.tagName !== "SELECT")) return null;
+  let selector = null;
+  const idxClasses = ["member-name-input","paid-amount","bank-select","acc-number-input"];
+  if(active.id){
+    selector = "#" + active.id;
+  } else if(active.dataset.idx !== undefined){
+    const cls = idxClasses.find(c => active.classList.contains(c));
+    if(cls) selector = `.${cls}[data-idx="${active.dataset.idx}"]`;
+  } else if(active.dataset.row !== undefined){
+    const cls = [...active.classList].find(c => ["item-name","item-qty","item-cost","item-disc-value","item-disc-type"].includes(c));
+    if(cls) selector = `.${cls}[data-row="${active.dataset.row}"]`;
+  }
+  if(!selector) return null;
+  return { selector, start: active.selectionStart, end: active.selectionEnd };
+}
+function restoreFocus(info){
+  if(!info) return;
+  const el = document.querySelector(info.selector);
+  if(!el) return;
+  el.focus();
+  if(typeof info.start === "number" && el.setSelectionRange){
+    try{ el.setSelectionRange(info.start, info.end); }catch(e){}
+  }
+}
+
+/* ---------- Full structural render (only for add/remove row & column changes) ---------- */
+function render(){
+  const focusInfo = captureFocus();
+
+  // header member columns
+  const headerRow = document.getElementById("headerRow");
+  headerRow.querySelectorAll(".member-col").forEach(el => el.remove());
+  const costHeadTh = headerRow.children[8]; // Cost/Head th (after 8 fixed cols: Menu,Qty,Cost,DiscValue,DiscType,Discount,CostSC,CostVAT)
+  state.members.forEach((m, idx) => {
+    const th = document.createElement("th");
+    th.className = "member-col";
+    th.innerHTML = `
+      <input type="text" class="member-name-input" data-idx="${idx}" value="${escapeAttr(m)}">
+      <button class="remove-member-btn" data-idx="${idx}">remove</button>
+    `;
+    headerRow.insertBefore(th, costHeadTh);
+  });
+
+  // body rows
+  const body = document.getElementById("itemsBody");
+  body.innerHTML = "";
+  state.items.forEach((item, rIdx) => {
+    const tr = document.createElement("tr");
+    let membersHtml = "";
+    state.members.forEach((m, cIdx) => {
+      membersHtml += `<td class="member-col">
+        <input type="checkbox" data-row="${rIdx}" data-col="${cIdx}" class="consume-check" ${item.consumed[cIdx] ? "checked" : ""}>
+      </td>`;
+    });
+    tr.innerHTML = `
+      <td><input type="text" class="item-name" data-row="${rIdx}" value="${escapeAttr(item.name)}"></td>
+      <td><input type="number" class="item-qty" data-row="${rIdx}" value="${item.qty}" min="0" step="1"></td>
+      <td><input type="number" class="item-cost" data-row="${rIdx}" value="${item.cost}" min="0" step="0.01"></td>
+      <td><input type="number" class="item-disc-value" data-row="${rIdx}" value="${item.discountValue||0}" min="0" step="0.01" placeholder="0"></td>
+      <td>
+        <select class="item-disc-type" data-row="${rIdx}">
+          <option value="percent" ${item.discountType !== "amount" ? "selected" : ""}>%</option>
+          <option value="amount" ${item.discountType === "amount" ? "selected" : ""}>฿</option>
+        </select>
+      </td>
+      <td><span class="readonly-val discount-val" data-row="${rIdx}"></span></td>
+      <td><span class="readonly-val cost-sc-val" data-row="${rIdx}"></span></td>
+      <td><span class="readonly-val cost-vat-val" data-row="${rIdx}"></span></td>
+      ${membersHtml}
+      <td><span class="readonly-val cost-head-val" data-row="${rIdx}"></span></td>
+      <td><button class="icon-btn remove-item-btn" data-row="${rIdx}" title="Remove item">✕</button></td>
+    `;
+    body.appendChild(tr);
+  });
+
+  // footer skeleton (values filled by patchCalculations)
+  const foot = document.getElementById("tableFoot");
+  let memberFootHtml = "";
+  state.members.forEach((m, cIdx) => {
+    memberFootHtml += `<td class="member-col member-total-val" data-idx="${cIdx}"></td>`;
+  });
+  foot.innerHTML = `
+    <tr>
+      <td colspan="2">Total Amount</td>
+      <td class="total-base-val"></td>
+      <td></td>
+      <td></td>
+      <td class="total-discount-val"></td>
+      <td class="total-sc-val"></td>
+      <td class="total-vat-val"></td>
+      ${memberFootHtml}
+      <td></td>
+      <td></td>
+    </tr>
+  `;
+
+  // summary cards skeleton
+  const grid = document.getElementById("summaryGrid");
+  grid.innerHTML = "";
+  state.members.forEach((m, idx) => {
+    const paid = !!state.paid[idx];
+    const card = document.createElement("div");
+    card.className = "summary-card";
+    card.dataset.idx = idx;
+    card.innerHTML = `
+      <div class="name">${escapeHtml(m)}</div>
+      <div class="amount"></div>
+      <div class="status ${paid ? "paid" : "unpaid"}" data-idx="${idx}">${paid ? "✅ Paid" : "◻️ Not paid"}</div>
+    `;
+    grid.appendChild(card);
+  });
+
+  // "Who Paid First" table skeleton
+  const paidBody = document.getElementById("paidBody");
+  paidBody.innerHTML = "";
+  state.members.forEach((m, idx) => {
+    const tr = document.createElement("tr");
+    const paidVal = state.paidAmounts[idx] ?? 0;
+    tr.innerHTML = `
+      <td><strong>${escapeHtml(m)}</strong></td>
+      <td><input type="number" class="paid-amount" data-idx="${idx}" value="${paidVal}" min="0" step="0.01"></td>
+      <td><span class="readonly-val paid-share-val" data-idx="${idx}"></span></td>
+      <td><span class="balance-val" data-idx="${idx}"></span></td>
+    `;
+    paidBody.appendChild(tr);
+  });
+
+  attachRowListeners();
+  patchCalculations();
+  restoreFocus(focusInfo);
+}
+
+/* ---------- Lightweight patch: recompute + update read-only numbers only.
+   Never rebuilds or replaces any <input>, so it is 100% safe to call on
+   every keystroke (typing multiple digits/characters works normally). ---------- */
+function patchCalculations(){
+  const focusInfo = captureFocus();
+  syncSettingsInputs();
+
+  let totalBase = 0, totalDiscount = 0, totalSC = 0, totalVAT = 0;
+  state.items.forEach((item, rIdx) => {
+    const { discount, costSC, costVAT, perHead } = calcRow(item);
+    totalBase += Number(item.cost||0);
+    totalDiscount += discount;
+    totalSC += costSC;
+    totalVAT += costVAT;
+    const discEl = document.querySelector(`.discount-val[data-row="${rIdx}"]`);
+    if(discEl){
+      discEl.textContent = discount > 0.004 ? "-" + fmt(discount) : "—";
+      discEl.classList.toggle("has-discount", discount > 0.004);
+    }
+    const discInputEl = document.querySelector(`.item-disc-value[data-row="${rIdx}"]`);
+    if(discInputEl){
+      discInputEl.classList.toggle("has-discount", discount > 0.004);
+    }
+    setText(`.cost-sc-val[data-row="${rIdx}"]`, fmt(costSC));
+    setText(`.cost-vat-val[data-row="${rIdx}"]`, fmt(costVAT));
+    setText(`.cost-head-val[data-row="${rIdx}"]`, fmt(perHead));
+  });
+
+  const memberTotals = state.members.map((m, cIdx) => {
+    return state.items.reduce((sum, item) => {
+      if(item.consumed[cIdx]) return sum + calcRow(item).perHead;
+      return sum;
+    }, 0);
+  });
+
+  setText(".total-base-val", fmt(totalBase));
+  setText(".total-discount-val", totalDiscount > 0.004 ? "-" + fmt(totalDiscount) : fmt(0));
+  const totalDiscEl = document.querySelector(".total-discount-val");
+  if(totalDiscEl) totalDiscEl.classList.toggle("has-discount", totalDiscount > 0.004);
+  setText(".total-sc-val", fmt(totalSC));
+  setText(".total-vat-val", fmt(totalVAT));
+  memberTotals.forEach((t, cIdx) => setText(`.member-total-val[data-idx="${cIdx}"]`, fmt(t)));
+  memberTotals.forEach((t, idx) => setText(`.summary-card[data-idx="${idx}"] .amount`, fmt(t)));
+  setText("#grandTotal", fmt(totalVAT));
+
+  const balances = state.members.map((m, idx) => round2(Number(state.paidAmounts[idx]||0) - memberTotals[idx]));
+  state.members.forEach((m, idx) => {
+    setText(`.paid-share-val[data-idx="${idx}"]`, fmt(memberTotals[idx]));
+    const b = balances[idx];
+    const balEl = document.querySelector(`.balance-val[data-idx="${idx}"]`);
+    if(balEl){
+      let cls = "zero", label = fmt(0);
+      if(b > 0.01){ cls = "positive"; label = "▲ " + fmt(b) + " (gets back)"; }
+      else if(b < -0.01){ cls = "negative"; label = "▼ " + fmt(Math.abs(b)) + " (owes)"; }
+      else { label = "settled"; }
+      balEl.className = "balance-val " + cls;
+      balEl.textContent = label;
+    }
+  });
+
+  renderSettlement(balances);
+  restoreFocus(focusInfo);
+  return { totalBase, totalDiscount, totalSC, totalVAT, memberTotals, balances };
+}
+
+function setText(selector, text){
+  const el = document.querySelector(selector);
+  if(el) el.textContent = text;
+}
+
+function syncSettingsInputs(){
+  const sc = document.getElementById("scPercent");
+  const vat = document.getElementById("vatPercent");
+  const cur = document.getElementById("currencySymbol");
+  if(sc && document.activeElement !== sc) sc.value = state.scPercent;
+  if(vat && document.activeElement !== vat) vat.value = state.vatPercent;
+  if(cur && document.activeElement !== cur) cur.value = state.currencySymbol;
+}
+
+function computeTransactions(balances){
+  const creditors = [], debtors = [];
+  state.members.forEach((m, idx) => {
+    const b = round2(balances[idx]);
+    if(b > 0.01) creditors.push({ name: m, idx, amt: b });
+    else if(b < -0.01) debtors.push({ name: m, idx, amt: -b });
+  });
+  creditors.sort((a,b) => b.amt - a.amt);
+  debtors.sort((a,b) => b.amt - a.amt);
+
+  const transactions = [];
+  let ci = 0, di = 0;
+  while(ci < creditors.length && di < debtors.length){
+    const c = creditors[ci], d = debtors[di];
+    const amt = round2(Math.min(c.amt, d.amt));
+    if(amt > 0.01) transactions.push({ from: d.name, to: c.name, toIdx: c.idx, amount: amt });
+    c.amt = round2(c.amt - amt);
+    d.amt = round2(d.amt - amt);
+    if(c.amt <= 0.01) ci++;
+    if(d.amt <= 0.01) di++;
+  }
+  return transactions;
+}
+
+function bankOptionsHtml(selected){
+  let opts = `<option value=""${selected ? "" : " selected"}>— เลือกช่องทางรับโอน —</option>`;
+  opts += `<optgroup label="พร้อมเพย์">`;
+  PAYMENT_METHODS.forEach(b => {
+    opts += `<option value="${escapeAttr(b)}"${b === selected ? " selected" : ""}>${escapeHtml(b)}</option>`;
+  });
+  opts += `</optgroup><optgroup label="ธนาคาร">`;
+  THAI_BANKS.forEach(b => {
+    opts += `<option value="${escapeAttr(b)}"${b === selected ? " selected" : ""}>${escapeHtml(b)}</option>`;
+  });
+  opts += `</optgroup>`;
+  return opts;
+}
+function isPromptPay(bankName){
+  return PAYMENT_METHODS.includes(bankName);
+}
+
+function renderSettlement(balances){
+  const listEl = document.getElementById("settleList");
+  if(!listEl) return;
+  const transactions = computeTransactions(balances);
+
+  if(transactions.length === 0){
+    listEl.innerHTML = `<div class="all-settled">✅ Everyone is settled — no transfers needed.</div>`;
+    return;
+  }
+
+  listEl.innerHTML = transactions.map((t, tIdx) => `
+    <div class="settle-row">
+      <div class="settle-top-line">
+        <span class="settle-from">${escapeHtml(t.from)}</span>
+        <span class="settle-arrow">➜</span>
+        <span class="settle-to">${escapeHtml(t.to)}</span>
+        <span class="settle-amount">${fmt(t.amount)}</span>
+      </div>
+      <div class="settle-bank-row">
+        <label>โอนเข้าบัญชี ${escapeHtml(t.to)}:</label>
+        <select class="bank-select" data-idx="${t.toIdx}">
+          ${bankOptionsHtml(state.bankNames[t.toIdx] || "")}
+        </select>
+        <div class="acc-number-wrap">
+          <input type="text" class="acc-number-input" data-idx="${t.toIdx}"
+                 placeholder="${isPromptPay(state.bankNames[t.toIdx]) ? "เบอร์โทรศัพท์ หรือ เลขบัตร ปชช." : "เลขที่บัญชี"}"
+                 value="${escapeAttr(state.bankAccounts[t.toIdx] || "")}">
+          <button type="button" class="copy-acc-btn" data-idx="${t.toIdx}" title="คัดลอกเลขบัญชี">📋 Copy</button>
+        </div>
+      </div>
+    </div>
+  `).join("");
+
+  // Wire up bank dropdown + account number inputs (data model update only,
+  // no full re-render, so typing the account number works normally).
+  // IMPORTANT: the same person (data-idx) can appear in more than one
+  // settle-up row (e.g. both Tae→Bom and Whaa→Bom show Bom's bank details).
+  // Whenever one copy changes, we must mirror the value into every other
+  // element sharing that same data-idx so all rows stay in sync.
+  listEl.querySelectorAll(".bank-select").forEach(el => {
+    el.addEventListener("change", e => {
+      const idx = e.target.dataset.idx;
+      state.bankNames[idx] = e.target.value;
+      saveState();
+      const newPlaceholder = isPromptPay(e.target.value) ? "เบอร์โทรศัพท์ หรือ เลขบัตร ปชช." : "เลขที่บัญชี";
+      listEl.querySelectorAll(`.bank-select[data-idx="${idx}"]`).forEach(otherSel => {
+        if(otherSel !== e.target) otherSel.value = e.target.value;
+      });
+      listEl.querySelectorAll(`.acc-number-input[data-idx="${idx}"]`).forEach(inputEl => {
+        inputEl.placeholder = newPlaceholder;
+      });
+    });
+  });
+  listEl.querySelectorAll(".acc-number-input").forEach(el => {
+    el.addEventListener("input", e => {
+      const idx = e.target.dataset.idx;
+      state.bankAccounts[idx] = e.target.value;
+      saveState();
+      listEl.querySelectorAll(`.acc-number-input[data-idx="${idx}"]`).forEach(otherInput => {
+        if(otherInput !== e.target) otherInput.value = e.target.value;
+      });
+    });
+  });
+  listEl.querySelectorAll(".copy-acc-btn").forEach(el => {
+    el.addEventListener("click", e => {
+      const btn = e.currentTarget;
+      const idx = btn.dataset.idx;
+      const value = state.bankAccounts[idx] || "";
+      if(!value){
+        btn.textContent = "⚠️ ไม่มีเลข";
+        setTimeout(() => { btn.innerHTML = "📋 Copy"; }, 1200);
+        return;
+      }
+      const markCopied = () => {
+        btn.classList.add("copied");
+        btn.textContent = "✅ Copied";
+        setTimeout(() => {
+          btn.classList.remove("copied");
+          btn.innerHTML = "📋 Copy";
+        }, 1200);
+      };
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(value).then(markCopied).catch(() => fallbackCopy(value, markCopied));
+      } else {
+        fallbackCopy(value, markCopied);
+      }
+    });
+  });
+}
+
+function fallbackCopy(text, onDone){
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try{ document.execCommand("copy"); }catch(e){}
+  document.body.removeChild(ta);
+  if(onDone) onDone();
+}
+
+/* ---------- Event wiring ---------- */
+function attachRowListeners(){
+  // Text field (item name): update data model only, no re-render — this is
+  // what allows typing full names/words without interruption.
+  document.querySelectorAll(".item-name").forEach(el=>{
+    el.addEventListener("input", e=>{
+      state.items[e.target.dataset.row].name = e.target.value;
+      saveState();
+    });
+  });
+  // Qty / Cost: update data + patch calculated numbers only. No structural
+  // re-render happens here, so typing multiple digits in a row works fine.
+  document.querySelectorAll(".item-qty").forEach(el=>{
+    el.addEventListener("input", e=>{
+      state.items[e.target.dataset.row].qty = parseFloat(e.target.value) || 0;
+      saveState(); patchCalculations();
+    });
+  });
+  document.querySelectorAll(".item-cost").forEach(el=>{
+    el.addEventListener("input", e=>{
+      state.items[e.target.dataset.row].cost = parseFloat(e.target.value) || 0;
+      saveState(); patchCalculations();
+    });
+  });
+  // Per-item discount controls: each menu item can have its own discount
+  // (or none at all), instead of one discount applied to every item.
+  document.querySelectorAll(".item-disc-value").forEach(el=>{
+    el.addEventListener("input", e=>{
+      state.items[e.target.dataset.row].discountValue = Math.max(0, parseFloat(e.target.value) || 0);
+      saveState(); patchCalculations();
+    });
+  });
+  document.querySelectorAll(".item-disc-type").forEach(el=>{
+    el.addEventListener("change", e=>{
+      state.items[e.target.dataset.row].discountType = e.target.value;
+      saveState(); patchCalculations();
+    });
+  });
+  document.querySelectorAll(".consume-check").forEach(el=>{
+    el.addEventListener("change", e=>{
+      const r = e.target.dataset.row, c = e.target.dataset.col;
+      state.items[r].consumed[c] = e.target.checked;
+      saveState(); patchCalculations();
+    });
+  });
+  document.querySelectorAll(".remove-item-btn").forEach(el=>{
+    el.addEventListener("click", e=>{
+      const r = Number(e.currentTarget.dataset.row);
+      state.items.splice(r,1);
+      saveState(); render();
+    });
+  });
+  document.querySelectorAll(".member-name-input").forEach(el=>{
+    el.addEventListener("input", e=>{
+      const idx = e.target.dataset.idx;
+      state.members[idx] = e.target.value;
+      saveState();
+      setText(`.summary-card[data-idx="${idx}"] .name`, e.target.value);
+      const paidRow = document.querySelector(`.paid-amount[data-idx="${idx}"]`);
+      if(paidRow){
+        const nameCell = paidRow.closest("tr").querySelector("strong");
+        if(nameCell) nameCell.textContent = e.target.value;
+      }
+    });
+  });
+  document.querySelectorAll(".remove-member-btn").forEach(el=>{
+    el.addEventListener("click", e=>{
+      const idx = Number(e.currentTarget.dataset.idx);
+      state.members.splice(idx,1);
+      state.paid.splice(idx,1);
+      state.paidAmounts.splice(idx,1);
+      state.bankNames.splice(idx,1);
+      state.bankAccounts.splice(idx,1);
+      state.items.forEach(item => item.consumed.splice(idx,1));
+      saveState(); render();
+    });
+  });
+  document.querySelectorAll(".status").forEach(el=>{
+    el.addEventListener("click", e=>{
+      const idx = Number(e.currentTarget.dataset.idx);
+      state.paid[idx] = !state.paid[idx];
+      saveState(); render();
+    });
+  });
+  document.querySelectorAll(".paid-amount").forEach(el=>{
+    el.addEventListener("input", e=>{
+      const idx = e.target.dataset.idx;
+      state.paidAmounts[idx] = parseFloat(e.target.value) || 0;
+      saveState(); patchCalculations();
+    });
+  });
+}
+
+document.getElementById("scPercent").addEventListener("input", e=>{
+  state.scPercent = parseFloat(e.target.value) || 0;
+  saveState(); patchCalculations();
+});
+document.getElementById("vatPercent").addEventListener("input", e=>{
+  state.vatPercent = parseFloat(e.target.value) || 0;
+  saveState(); patchCalculations();
+});
+document.getElementById("currencySymbol").addEventListener("input", e=>{
+  state.currencySymbol = e.target.value || "";
+  saveState(); patchCalculations();
+});
+
+document.getElementById("addItemBtn").addEventListener("click", ()=>{
+  state.items.push({
+    name: "New item",
+    qty: 1,
+    cost: 0,
+    discountType: "percent",
+    discountValue: 0,
+    consumed: state.members.map(()=>false)
+  });
+  saveState(); render();
+});
+
+document.getElementById("addMemberBtn").addEventListener("click", ()=>{
+  const name = "Person " + (state.members.length + 1);
+  state.members.push(name);
+  state.paid.push(false);
+  state.paidAmounts.push(0);
+  state.bankNames.push("");
+  state.bankAccounts.push("");
+  state.items.forEach(item => item.consumed.push(false));
+  saveState(); render();
+});
+
+/* ---------- Share (View Only) ----------
+   Builds a completely separate, self-contained HTML file that bakes in the
+   CURRENT numbers as plain static text/markup — no <input>, no add/remove
+   buttons, no editable checkboxes. Friends who open this file can look at
+   everything (items, split, who owes what, who paid first, settle-up) but
+   cannot change a single value. The original interactive dashboard (this
+   file) is left completely untouched. */
+function buildViewOnlySnapshot(){
+  const calc = state.items.map(item => calcRow(item));
+  const totalBase = state.items.reduce((s,i)=>s+Number(i.cost||0),0);
+  const totalDiscount = calc.reduce((s,c)=>s+c.discount,0);
+  const totalSC = calc.reduce((s,c)=>s+c.costSC,0);
+  const totalVAT = calc.reduce((s,c)=>s+c.costVAT,0);
+  const memberTotals = state.members.map((m, cIdx) =>
+    state.items.reduce((sum, item, rIdx) => item.consumed[cIdx] ? sum + calc[rIdx].perHead : sum, 0)
+  );
+  const balances = state.members.map((m, idx) => round2(Number(state.paidAmounts[idx]||0) - memberTotals[idx]));
+
+  const memberHeaderCells = state.members.map(m => `<th class="member-col">${escapeHtml(m)}</th>`).join("");
+  const rowsHtml = state.items.map((item, rIdx) => {
+    const { discount, costSC, costVAT, perHead } = calc[rIdx];
+    const memberCells = state.members.map((m, cIdx) =>
+      `<td class="member-col">${item.consumed[cIdx] ? "✅" : "—"}</td>`
+    ).join("");
+    let discountLabel = "—";
+    if(discount > 0.004){
+      const typeLabel = item.discountType === "amount" ? "Fixed" : (Number(item.discountValue||0) + "%");
+      discountLabel = "-" + fmt(discount) + ` (${typeLabel})`;
+    }
+    return `<tr>
+      <td>${escapeHtml(item.name)}</td>
+      <td>${item.qty}</td>
+      <td>${fmt(item.cost)}</td>
+      <td${discount > 0.004 ? ' style="color:#e0433d;font-weight:600;"' : ""}>${discountLabel}</td>
+      <td>${fmt(costSC)}</td>
+      <td>${fmt(costVAT)}</td>
+      ${memberCells}
+      <td>${fmt(perHead)}</td>
+    </tr>`;
+  }).join("");
+  const memberTotalCells = memberTotals.map(t => `<td class="member-col">${fmt(t)}</td>`).join("");
+
+  const summaryCardsHtml = state.members.map((m, idx) => {
+    const paid = !!state.paid[idx];
+    return `<div class="summary-card">
+      <div class="name">${escapeHtml(m)}</div>
+      <div class="amount">${fmt(memberTotals[idx])}</div>
+      <div class="status ${paid ? "paid" : "unpaid"}">${paid ? "✅ Paid" : "◻️ Not paid"}</div>
+    </div>`;
+  }).join("");
+
+  const paidRowsHtml = state.members.map((m, idx) => {
+    const b = balances[idx];
+    let cls = "zero", label = "settled";
+    if(b > 0.01){ cls = "positive"; label = "▲ " + fmt(b) + " (gets back)"; }
+    else if(b < -0.01){ cls = "negative"; label = "▼ " + fmt(Math.abs(b)) + " (owes)"; }
+    return `<tr>
+      <td><strong>${escapeHtml(m)}</strong></td>
+      <td>${fmt(state.paidAmounts[idx]||0)}</td>
+      <td>${fmt(memberTotals[idx])}</td>
+      <td><span class="balance-val ${cls}">${label}</span></td>
+    </tr>`;
+  }).join("");
+
+  // Settlement (same greedy min-transaction algorithm as the live dashboard)
+  const transactions = computeTransactions(balances);
+  const settleHtml = transactions.length === 0
+    ? `<div class="all-settled">✅ Everyone is settled — no transfers needed.</div>`
+    : transactions.map((t, tIdx) => {
+        const bankName = state.bankNames[t.toIdx] || "";
+        const bankAcc = state.bankAccounts[t.toIdx] || "";
+        const bankLine = (bankName || bankAcc)
+          ? `<div class="settle-bank-row">
+              <label>โอนเข้าบัญชี ${escapeHtml(t.to)}:</label>
+              <span>${escapeHtml(bankName || "—")}</span>
+              <div class="acc-number-wrap">
+                <span class="acc-number-input" id="acc-view-${tIdx}" style="display:flex;align-items:center;">${escapeHtml(bankAcc || "—")}</span>
+                ${bankAcc ? `<button type="button" class="copy-acc-btn" data-copy="${escapeAttr(bankAcc)}">📋 Copy</button>` : ""}
+              </div>
+            </div>`
+          : "";
+        return `<div class="settle-row">
+          <div class="settle-top-line">
+            <span class="settle-from">${escapeHtml(t.from)}</span>
+            <span class="settle-arrow">➜</span>
+            <span class="settle-to">${escapeHtml(t.to)}</span>
+            <span class="settle-amount">${fmt(t.amount)}</span>
+          </div>
+          ${bankLine}
+        </div>`;
+      }).join("");
+
+  // Grab the <style> block from this live page so the snapshot looks identical.
+  const styleBlock = document.querySelector("style").outerHTML;
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Split Bill (View Only)</title>
+${styleBlock}
+</head>
+<body>
+<div class="wrap view-only">
+  <header class="top">
+    <div>
+      <h1>🧾 Split Bill Dashboard</h1>
+      <p>Shared summary — view only, cannot be edited.</p>
+    </div>
+  </header>
+
+  <div class="view-only-banner">🔒 View-only copy — ask the owner to update the live dashboard if any numbers change.</div>
+
+  <div class="card">
+    <h2>⚙️ Charges</h2>
+    <div class="settings-row">
+      <div class="field"><label>Service Charge</label><div style="padding:8px 0;font-weight:600;">${state.scPercent}%</div></div>
+      <div class="field"><label>VAT</label><div style="padding:8px 0;font-weight:600;">${state.vatPercent}%</div></div>
+      <div class="field"><label>Total Discount</label><div style="padding:8px 0;font-weight:600;${totalDiscount > 0.004 ? " color:" + "#e0433d;" : ""}">${totalDiscount > 0.004 ? "-" + fmt(totalDiscount) : fmt(0)}</div></div>
+      <div class="field"><label>Currency</label><div style="padding:8px 0;font-weight:600;">${escapeHtml(state.currencySymbol)}</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🍽️ Menu &amp; Split</h2>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Menu</th><th>Qty</th><th>Cost w/o SC &amp; VAT</th><th>Discount</th><th>Cost w/ SC</th><th>Cost w/ VAT</th>
+            ${memberHeaderCells}
+            <th>Cost/Head</th>
+          </tr>
+        </thead>
+        <tbody>${rowsHtml}</tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2">Total Amount</td>
+            <td>${fmt(totalBase)}</td><td${totalDiscount > 0.004 ? ' style="color:#e0433d;"' : ""}>${totalDiscount > 0.004 ? "-" + fmt(totalDiscount) : fmt(0)}</td><td>${fmt(totalSC)}</td><td>${fmt(totalVAT)}</td>
+            ${memberTotalCells}
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>👥 Who Owes What</h2>
+    <div class="summary-grid">${summaryCardsHtml}</div>
+    <div class="grand-total"><span>Grand Total (all items, incl. discount + SC + VAT)</span><b>${fmt(totalVAT)}</b></div>
+  </div>
+
+  <div class="card">
+    <h2>💵 Who Paid First</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Person</th><th>Amount Paid Upfront</th><th>Their Share</th><th>Balance</th></tr></thead>
+        <tbody>${paidRowsHtml}</tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🔄 Settle Up — Who Transfers to Whom</h2>
+    <div>${settleHtml}</div>
+  </div>
+
+  <footer>Split Bill Dashboard · view-only snapshot, generated ${new Date().toLocaleString()}</footer>
+</div>
+<` + `script>
+  // View-only snapshot still allows copying account numbers to clipboard —
+  // that's a convenience action, not an edit, so all copy buttons work.
+  document.querySelectorAll(".copy-acc-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var value = btn.getAttribute("data-copy") || "";
+      if(!value) return;
+      var done = function(){
+        btn.classList.add("copied");
+        btn.textContent = "✅ Copied";
+        setTimeout(function(){
+          btn.classList.remove("copied");
+          btn.innerHTML = "📋 Copy";
+        }, 1200);
+      };
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(value).then(done).catch(function(){
+          var ta = document.createElement("textarea");
+          ta.value = value; ta.style.position = "fixed"; ta.style.opacity = "0";
+          document.body.appendChild(ta); ta.focus(); ta.select();
+          try{ document.execCommand("copy"); }catch(e){}
+          document.body.removeChild(ta);
+          done();
+        });
+      } else {
+        var ta = document.createElement("textarea");
+        ta.value = value; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.focus(); ta.select();
+        try{ document.execCommand("copy"); }catch(e){}
+        document.body.removeChild(ta);
+        done();
+      }
+    });
+  });
+<` + `/script>
+</body>
+</html>`;
+}
+
+document.getElementById("shareViewBtn").addEventListener("click", ()=>{
+  const html = buildViewOnlySnapshot();
+  const blob = new Blob([html], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "Split Bill (View Only).html";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+  if(confirm("Reset dashboard to the original sample data? This will discard current edits.")){
+    state = buildSample();
+    normalizeState();
+    saveState(); render();
+  }
+});
+
+document.getElementById("clearBtn").addEventListener("click", ()=>{
+  if(confirm("Clear all items and people? This cannot be undone.")){
+    state = { scPercent: state.scPercent, vatPercent: state.vatPercent, currencySymbol: state.currencySymbol, members: [], items: [], paid: [], paidAmounts: [], bankNames: [], bankAccounts: [] };
+    saveState(); render();
+  }
+});
+
+render();
+</script>
+</body>
+</html>
