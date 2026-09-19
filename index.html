@@ -123,7 +123,6 @@
   }
   tbody tr:hover{background:#fafafa;}
   td.member-col, th.member-col{text-align:center;}
-  /* Plain, clean number & text inputs everywhere — no native browser arrows */
   td input[type="text"], td input[type="number"]{
     border:1px solid transparent;
     background:transparent;
@@ -161,8 +160,6 @@
   td input[type="text"]:focus, td input[type="number"]:focus{
     border-color:var(--accent);
   }
-  /* Hide native up/down spinner arrows globally so all number fields are
-     plain type-in boxes (no arrows anywhere on Qty / Cost / Paid Amount). */
   input[type="number"]{ -moz-appearance:textfield; }
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button{
@@ -411,7 +408,6 @@
     body{padding:18px 12px 60px;}
     .card{padding:16px;}
   }
-  /* ---- View-only banner (only present in the shared snapshot file) ---- */
   .view-only-banner{
     display:flex;
     align-items:center;
@@ -429,6 +425,34 @@
     pointer-events:none;
   }
   .view-only .status{cursor:default;}
+
+  #cloudSyncBadge{
+    position:fixed;right:20px;bottom:20px;z-index:9998;padding:8px 15px;
+    border-radius:20px;font:600 12px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    box-shadow:0 4px 14px rgba(15,23,42,.16);transition:opacity .35s;pointer-events:none;
+  }
+  #piSyncLoginOverlay{
+    position:fixed;inset:0;z-index:99999;background:rgba(242,242,242,.98);
+    display:flex;align-items:center;justify-content:center;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  }
+  #piSyncLoginOverlay .login-card{
+    background:#fff;padding:34px 30px;border-radius:16px;width:340px;
+    box-shadow:0 12px 48px rgba(15,23,42,.14);box-sizing:border-box;
+    border:1px solid var(--border);
+  }
+  #piSyncLoginOverlay h2{margin:0;font-size:19px;font-weight:700;color:var(--text);letter-spacing:-.2px;}
+  #piSyncLoginOverlay .sub{font-size:13px;color:var(--muted);margin:6px 0 20px;}
+  #piSyncLoginOverlay input{
+    width:100%;padding:11px 12px;margin-bottom:9px;border:1px solid var(--border);
+    border-radius:9px;font-size:14px;box-sizing:border-box;outline:none;
+  }
+  #piSyncLoginOverlay button.go-btn{
+    width:100%;padding:11px;background:var(--accent);color:#fff;border:0;border-radius:9px;
+    font-size:14px;font-weight:600;cursor:pointer;margin-top:5px;
+  }
+  #piSyncLoginOverlay .msg{color:#e0433d;font-size:12px;margin-top:12px;min-height:16px;line-height:1.4;}
+  #syncStatusBtn{font-size:12px;}
 </style>
 </head>
 <body>
@@ -436,15 +460,16 @@
   <header class="top">
     <div>
       <h1>🧾 Split Bill Dashboard</h1>
-      <p>Add items, add people, tick who shared what — totals update automatically.</p>
+      <p>Add items, add people, tick who shared what — totals update automatically for everyone.</p>
     </div>
     <div class="toolbar">
+      <span id="syncStatusBtn" class="note" style="margin:0;font-style:normal;"></span>
       <button class="btn primary" id="shareViewBtn">🔗 Share (View Only)</button>
       <button class="btn" id="resetBtn">↺ Reset to sample</button>
       <button class="btn" id="clearBtn">🗑 Clear all</button>
+      <button class="btn" id="signOutBtn" title="Sign out of cloud sync">🚪 Sign out</button>
     </div>
   </header>
-
   <div class="card">
     <h2>⚙️ Charges</h2>
     <div class="settings-row">
@@ -470,7 +495,6 @@
       </div>
     </div>
   </div>
-
   <div class="card">
     <h2>🍽️ Menu &amp; Split</h2>
     <div class="table-scroll">
@@ -485,7 +509,6 @@
             <th>Discount</th>
             <th>Cost w/ SC</th>
             <th>Cost w/ VAT</th>
-            <!-- member columns injected here -->
             <th style="min-width:90px;">Cost/Head</th>
             <th style="width:36px;"></th>
           </tr>
@@ -500,7 +523,6 @@
     </div>
     <div class="note">* Discount can be set per item — leave it at 0 for items with no discount. Choose "%" to discount that item by a percentage, or "฿ Fixed" to knock a flat baht amount off just that item. Discount is applied before Service Charge and VAT. Cost/Head splits that item's Cost w/ VAT evenly across everyone checked in that row.</div>
   </div>
-
   <div class="card">
     <h2>👥 Who Owes What</h2>
     <div class="summary-grid" id="summaryGrid"></div>
@@ -509,7 +531,6 @@
       <b id="grandTotal">฿0.00</b>
     </div>
   </div>
-
   <div class="card">
     <h2>💵 Who Paid First</h2>
     <div class="table-scroll">
@@ -527,20 +548,16 @@
     </div>
     <div class="note">Enter how much each person actually paid at the restaurant (e.g. whoever paid the bill by card). Balance = Amount Paid − Their Share: ▲ means they should get money back, ▼ means they still owe.</div>
   </div>
-
   <div class="card">
     <h2>🔄 Settle Up — Who Transfers to Whom</h2>
     <div id="settleList"></div>
   </div>
-
-  <footer>Split Bill Dashboard · edits are saved automatically in this browser</footer>
+  <footer>Split Bill Dashboard · synced live via cloud — everyone with access sees the same numbers</footer>
 </div>
-
+<script id="seed-data" type="application/json">{"master": []}</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const STORAGE_KEY = "splitBillDashboardState_v5";
-
-// Commercial + state-owned banks operating in Thailand, used for the
-// "Settle Up" bank-account dropdown (source: Bank of Thailand FI list).
 const PAYMENT_METHODS = [
   "พร้อมเพย์ (PromptPay)"
 ];
@@ -567,9 +584,7 @@ const THAI_BANKS = [
   "ธนาคารซิตี้แบงก์ (Citibank)",
   "ธนาคารสแตนดาร์ดชาร์เตอร์ด (Standard Chartered)"
 ];
-
 function round2(n){ return Math.round((Number(n)||0) * 100) / 100; }
-
 function buildSample(){
   const scPercent = 10, vatPercent = 7, currencySymbol = "฿";
   const items = [
@@ -581,9 +596,6 @@ function buildSample(){
     { name: "ยำวุ้นเส้น",    qty: 1, cost: 220,  consumed: [true, false, false], discountType: "percent", discountValue: 0 }
   ];
   const members = ["Bom", "Tae", "Whaa"];
-  // Demo default: assume the first person on the list paid the whole bill
-  // upfront (e.g. paid by card), so the Settle Up section has something
-  // meaningful to show out of the box.
   const totalVAT = items.reduce((s, item) => {
     const costSC = item.cost * (1 + scPercent / 100);
     const costVAT = costSC * (1 + vatPercent / 100);
@@ -597,11 +609,8 @@ function buildSample(){
     bankAccounts: members.map((m, i) => i === 0 ? "123-4-56789-0" : "")
   };
 }
-
-let state = loadState() || buildSample();
-normalizeState();
-
-function loadState(){
+let state = null;
+function loadStateLocal(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
     if(!raw) return null;
@@ -610,11 +619,10 @@ function loadState(){
     return parsed;
   }catch(e){ return null; }
 }
-function saveState(){
+function saveStateLocal(){
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 function normalizeState(){
-  // Backfill fields for state saved by older versions of this dashboard.
   if(!Array.isArray(state.paid)) state.paid = state.members.map(() => false);
   if(!Array.isArray(state.paidAmounts)) state.paidAmounts = state.members.map(() => 0);
   if(!Array.isArray(state.bankNames)) state.bankNames = state.members.map(() => "");
@@ -626,8 +634,6 @@ function normalizeState(){
   state.items.forEach(item => {
     if(!Array.isArray(item.consumed)) item.consumed = state.members.map(() => false);
     while(item.consumed.length < state.members.length) item.consumed.push(false);
-    // Backfill per-item discount fields for items saved by older versions
-    // of this dashboard (which only had a single global discount).
     if(item.discountType !== "percent" && item.discountType !== "amount") item.discountType = "percent";
     if(typeof item.discountValue !== "number" || isNaN(item.discountValue)) item.discountValue = 0;
   });
@@ -636,7 +642,6 @@ function fmt(n){
   if(isNaN(n)) n = 0;
   return state.currencySymbol + Number(n).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2});
 }
-
 function getItemDiscount(item){
   const dVal = Number(item.discountValue||0);
   if(dVal <= 0) return 0;
@@ -644,7 +649,6 @@ function getItemDiscount(item){
   if(item.discountType === "amount"){
     return Math.min(cost, dVal);
   }
-  // percent (default)
   return Math.min(cost, cost * (dVal/100));
 }
 function calcRow(item){
@@ -656,13 +660,10 @@ function calcRow(item){
   const perHead = consumedCount > 0 ? costVAT / consumedCount : 0;
   return { discount, netCost, costSC, costVAT, perHead };
 }
-
 function escapeHtml(s){
   return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 }
 function escapeAttr(s){ return escapeHtml(s); }
-
-/* ---------- Focus preservation (belt & suspenders for structural rebuilds) ---------- */
 function captureFocus(){
   const active = document.activeElement;
   if(!active || (active.tagName !== "INPUT" && active.tagName !== "SELECT")) return null;
@@ -689,15 +690,11 @@ function restoreFocus(info){
     try{ el.setSelectionRange(info.start, info.end); }catch(e){}
   }
 }
-
-/* ---------- Full structural render (only for add/remove row & column changes) ---------- */
 function render(){
   const focusInfo = captureFocus();
-
-  // header member columns
   const headerRow = document.getElementById("headerRow");
   headerRow.querySelectorAll(".member-col").forEach(el => el.remove());
-  const costHeadTh = headerRow.children[8]; // Cost/Head th (after 8 fixed cols: Menu,Qty,Cost,DiscValue,DiscType,Discount,CostSC,CostVAT)
+  const costHeadTh = headerRow.children[8];
   state.members.forEach((m, idx) => {
     const th = document.createElement("th");
     th.className = "member-col";
@@ -707,8 +704,6 @@ function render(){
     `;
     headerRow.insertBefore(th, costHeadTh);
   });
-
-  // body rows
   const body = document.getElementById("itemsBody");
   body.innerHTML = "";
   state.items.forEach((item, rIdx) => {
@@ -739,8 +734,6 @@ function render(){
     `;
     body.appendChild(tr);
   });
-
-  // footer skeleton (values filled by patchCalculations)
   const foot = document.getElementById("tableFoot");
   let memberFootHtml = "";
   state.members.forEach((m, cIdx) => {
@@ -760,8 +753,6 @@ function render(){
       <td></td>
     </tr>
   `;
-
-  // summary cards skeleton
   const grid = document.getElementById("summaryGrid");
   grid.innerHTML = "";
   state.members.forEach((m, idx) => {
@@ -776,8 +767,6 @@ function render(){
     `;
     grid.appendChild(card);
   });
-
-  // "Who Paid First" table skeleton
   const paidBody = document.getElementById("paidBody");
   paidBody.innerHTML = "";
   state.members.forEach((m, idx) => {
@@ -791,19 +780,13 @@ function render(){
     `;
     paidBody.appendChild(tr);
   });
-
   attachRowListeners();
   patchCalculations();
   restoreFocus(focusInfo);
 }
-
-/* ---------- Lightweight patch: recompute + update read-only numbers only.
-   Never rebuilds or replaces any <input>, so it is 100% safe to call on
-   every keystroke (typing multiple digits/characters works normally). ---------- */
 function patchCalculations(){
   const focusInfo = captureFocus();
   syncSettingsInputs();
-
   let totalBase = 0, totalDiscount = 0, totalSC = 0, totalVAT = 0;
   state.items.forEach((item, rIdx) => {
     const { discount, costSC, costVAT, perHead } = calcRow(item);
@@ -824,14 +807,12 @@ function patchCalculations(){
     setText(`.cost-vat-val[data-row="${rIdx}"]`, fmt(costVAT));
     setText(`.cost-head-val[data-row="${rIdx}"]`, fmt(perHead));
   });
-
   const memberTotals = state.members.map((m, cIdx) => {
     return state.items.reduce((sum, item) => {
       if(item.consumed[cIdx]) return sum + calcRow(item).perHead;
       return sum;
     }, 0);
   });
-
   setText(".total-base-val", fmt(totalBase));
   setText(".total-discount-val", totalDiscount > 0.004 ? "-" + fmt(totalDiscount) : fmt(0));
   const totalDiscEl = document.querySelector(".total-discount-val");
@@ -841,7 +822,6 @@ function patchCalculations(){
   memberTotals.forEach((t, cIdx) => setText(`.member-total-val[data-idx="${cIdx}"]`, fmt(t)));
   memberTotals.forEach((t, idx) => setText(`.summary-card[data-idx="${idx}"] .amount`, fmt(t)));
   setText("#grandTotal", fmt(totalVAT));
-
   const balances = state.members.map((m, idx) => round2(Number(state.paidAmounts[idx]||0) - memberTotals[idx]));
   state.members.forEach((m, idx) => {
     setText(`.paid-share-val[data-idx="${idx}"]`, fmt(memberTotals[idx]));
@@ -856,17 +836,14 @@ function patchCalculations(){
       balEl.textContent = label;
     }
   });
-
   renderSettlement(balances);
   restoreFocus(focusInfo);
   return { totalBase, totalDiscount, totalSC, totalVAT, memberTotals, balances };
 }
-
 function setText(selector, text){
   const el = document.querySelector(selector);
   if(el) el.textContent = text;
 }
-
 function syncSettingsInputs(){
   const sc = document.getElementById("scPercent");
   const vat = document.getElementById("vatPercent");
@@ -875,7 +852,6 @@ function syncSettingsInputs(){
   if(vat && document.activeElement !== vat) vat.value = state.vatPercent;
   if(cur && document.activeElement !== cur) cur.value = state.currencySymbol;
 }
-
 function computeTransactions(balances){
   const creditors = [], debtors = [];
   state.members.forEach((m, idx) => {
@@ -885,7 +861,6 @@ function computeTransactions(balances){
   });
   creditors.sort((a,b) => b.amt - a.amt);
   debtors.sort((a,b) => b.amt - a.amt);
-
   const transactions = [];
   let ci = 0, di = 0;
   while(ci < creditors.length && di < debtors.length){
@@ -899,7 +874,6 @@ function computeTransactions(balances){
   }
   return transactions;
 }
-
 function bankOptionsHtml(selected){
   let opts = `<option value=""${selected ? "" : " selected"}>— เลือกช่องทางรับโอน —</option>`;
   opts += `<optgroup label="พร้อมเพย์">`;
@@ -916,17 +890,14 @@ function bankOptionsHtml(selected){
 function isPromptPay(bankName){
   return PAYMENT_METHODS.includes(bankName);
 }
-
 function renderSettlement(balances){
   const listEl = document.getElementById("settleList");
   if(!listEl) return;
   const transactions = computeTransactions(balances);
-
   if(transactions.length === 0){
     listEl.innerHTML = `<div class="all-settled">✅ Everyone is settled — no transfers needed.</div>`;
     return;
   }
-
   listEl.innerHTML = transactions.map((t, tIdx) => `
     <div class="settle-row">
       <div class="settle-top-line">
@@ -949,13 +920,6 @@ function renderSettlement(balances){
       </div>
     </div>
   `).join("");
-
-  // Wire up bank dropdown + account number inputs (data model update only,
-  // no full re-render, so typing the account number works normally).
-  // IMPORTANT: the same person (data-idx) can appear in more than one
-  // settle-up row (e.g. both Tae→Bom and Whaa→Bom show Bom's bank details).
-  // Whenever one copy changes, we must mirror the value into every other
-  // element sharing that same data-idx so all rows stay in sync.
   listEl.querySelectorAll(".bank-select").forEach(el => {
     el.addEventListener("change", e => {
       const idx = e.target.dataset.idx;
@@ -1006,7 +970,6 @@ function renderSettlement(balances){
     });
   });
 }
-
 function fallbackCopy(text, onDone){
   const ta = document.createElement("textarea");
   ta.value = text;
@@ -1019,19 +982,13 @@ function fallbackCopy(text, onDone){
   document.body.removeChild(ta);
   if(onDone) onDone();
 }
-
-/* ---------- Event wiring ---------- */
 function attachRowListeners(){
-  // Text field (item name): update data model only, no re-render — this is
-  // what allows typing full names/words without interruption.
   document.querySelectorAll(".item-name").forEach(el=>{
     el.addEventListener("input", e=>{
       state.items[e.target.dataset.row].name = e.target.value;
       saveState();
     });
   });
-  // Qty / Cost: update data + patch calculated numbers only. No structural
-  // re-render happens here, so typing multiple digits in a row works fine.
   document.querySelectorAll(".item-qty").forEach(el=>{
     el.addEventListener("input", e=>{
       state.items[e.target.dataset.row].qty = parseFloat(e.target.value) || 0;
@@ -1044,8 +1001,6 @@ function attachRowListeners(){
       saveState(); patchCalculations();
     });
   });
-  // Per-item discount controls: each menu item can have its own discount
-  // (or none at all), instead of one discount applied to every item.
   document.querySelectorAll(".item-disc-value").forEach(el=>{
     el.addEventListener("input", e=>{
       state.items[e.target.dataset.row].discountValue = Math.max(0, parseFloat(e.target.value) || 0);
@@ -1112,7 +1067,6 @@ function attachRowListeners(){
     });
   });
 }
-
 document.getElementById("scPercent").addEventListener("input", e=>{
   state.scPercent = parseFloat(e.target.value) || 0;
   saveState(); patchCalculations();
@@ -1125,7 +1079,6 @@ document.getElementById("currencySymbol").addEventListener("input", e=>{
   state.currencySymbol = e.target.value || "";
   saveState(); patchCalculations();
 });
-
 document.getElementById("addItemBtn").addEventListener("click", ()=>{
   state.items.push({
     name: "New item",
@@ -1137,7 +1090,6 @@ document.getElementById("addItemBtn").addEventListener("click", ()=>{
   });
   saveState(); render();
 });
-
 document.getElementById("addMemberBtn").addEventListener("click", ()=>{
   const name = "Person " + (state.members.length + 1);
   state.members.push(name);
@@ -1148,14 +1100,6 @@ document.getElementById("addMemberBtn").addEventListener("click", ()=>{
   state.items.forEach(item => item.consumed.push(false));
   saveState(); render();
 });
-
-/* ---------- Share (View Only) ----------
-   Builds a completely separate, self-contained HTML file that bakes in the
-   CURRENT numbers as plain static text/markup — no <input>, no add/remove
-   buttons, no editable checkboxes. Friends who open this file can look at
-   everything (items, split, who owes what, who paid first, settle-up) but
-   cannot change a single value. The original interactive dashboard (this
-   file) is left completely untouched. */
 function buildViewOnlySnapshot(){
   const calc = state.items.map(item => calcRow(item));
   const totalBase = state.items.reduce((s,i)=>s+Number(i.cost||0),0);
@@ -1166,7 +1110,6 @@ function buildViewOnlySnapshot(){
     state.items.reduce((sum, item, rIdx) => item.consumed[cIdx] ? sum + calc[rIdx].perHead : sum, 0)
   );
   const balances = state.members.map((m, idx) => round2(Number(state.paidAmounts[idx]||0) - memberTotals[idx]));
-
   const memberHeaderCells = state.members.map(m => `<th class="member-col">${escapeHtml(m)}</th>`).join("");
   const rowsHtml = state.items.map((item, rIdx) => {
     const { discount, costSC, costVAT, perHead } = calc[rIdx];
@@ -1190,7 +1133,6 @@ function buildViewOnlySnapshot(){
     </tr>`;
   }).join("");
   const memberTotalCells = memberTotals.map(t => `<td class="member-col">${fmt(t)}</td>`).join("");
-
   const summaryCardsHtml = state.members.map((m, idx) => {
     const paid = !!state.paid[idx];
     return `<div class="summary-card">
@@ -1199,7 +1141,6 @@ function buildViewOnlySnapshot(){
       <div class="status ${paid ? "paid" : "unpaid"}">${paid ? "✅ Paid" : "◻️ Not paid"}</div>
     </div>`;
   }).join("");
-
   const paidRowsHtml = state.members.map((m, idx) => {
     const b = balances[idx];
     let cls = "zero", label = "settled";
@@ -1212,8 +1153,6 @@ function buildViewOnlySnapshot(){
       <td><span class="balance-val ${cls}">${label}</span></td>
     </tr>`;
   }).join("");
-
-  // Settlement (same greedy min-transaction algorithm as the live dashboard)
   const transactions = computeTransactions(balances);
   const settleHtml = transactions.length === 0
     ? `<div class="all-settled">✅ Everyone is settled — no transfers needed.</div>`
@@ -1240,10 +1179,7 @@ function buildViewOnlySnapshot(){
           ${bankLine}
         </div>`;
       }).join("");
-
-  // Grab the <style> block from this live page so the snapshot looks identical.
   const styleBlock = document.querySelector("style").outerHTML;
-
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1260,9 +1196,7 @@ ${styleBlock}
       <p>Shared summary — view only, cannot be edited.</p>
     </div>
   </header>
-
   <div class="view-only-banner">🔒 View-only copy — ask the owner to update the live dashboard if any numbers change.</div>
-
   <div class="card">
     <h2>⚙️ Charges</h2>
     <div class="settings-row">
@@ -1272,7 +1206,6 @@ ${styleBlock}
       <div class="field"><label>Currency</label><div style="padding:8px 0;font-weight:600;">${escapeHtml(state.currencySymbol)}</div></div>
     </div>
   </div>
-
   <div class="card">
     <h2>🍽️ Menu &amp; Split</h2>
     <div class="table-scroll">
@@ -1296,13 +1229,11 @@ ${styleBlock}
       </table>
     </div>
   </div>
-
   <div class="card">
     <h2>👥 Who Owes What</h2>
     <div class="summary-grid">${summaryCardsHtml}</div>
     <div class="grand-total"><span>Grand Total (all items, incl. discount + SC + VAT)</span><b>${fmt(totalVAT)}</b></div>
   </div>
-
   <div class="card">
     <h2>💵 Who Paid First</h2>
     <div class="table-scroll">
@@ -1312,17 +1243,13 @@ ${styleBlock}
       </table>
     </div>
   </div>
-
   <div class="card">
     <h2>🔄 Settle Up — Who Transfers to Whom</h2>
     <div>${settleHtml}</div>
   </div>
-
   <footer>Split Bill Dashboard · view-only snapshot, generated ${new Date().toLocaleString()}</footer>
 </div>
 <` + `script>
-  // View-only snapshot still allows copying account numbers to clipboard —
-  // that's a convenience action, not an edit, so all copy buttons work.
   document.querySelectorAll(".copy-acc-btn").forEach(function(btn){
     btn.addEventListener("click", function(){
       var value = btn.getAttribute("data-copy") || "";
@@ -1358,7 +1285,6 @@ ${styleBlock}
 </body>
 </html>`;
 }
-
 document.getElementById("shareViewBtn").addEventListener("click", ()=>{
   const html = buildViewOnlySnapshot();
   const blob = new Blob([html], { type: "text/html" });
@@ -1371,23 +1297,164 @@ document.getElementById("shareViewBtn").addEventListener("click", ()=>{
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 });
-
 document.getElementById("resetBtn").addEventListener("click", ()=>{
-  if(confirm("Reset dashboard to the original sample data? This will discard current edits.")){
+  if(confirm("Reset dashboard to the original sample data? This will discard current edits for EVERYONE (cloud sync).")){
     state = buildSample();
     normalizeState();
     saveState(); render();
   }
 });
-
 document.getElementById("clearBtn").addEventListener("click", ()=>{
-  if(confirm("Clear all items and people? This cannot be undone.")){
+  if(confirm("Clear all items and people? This cannot be undone, and applies to EVERYONE (cloud sync).")){
     state = { scPercent: state.scPercent, vatPercent: state.vatPercent, currencySymbol: state.currencySymbol, members: [], items: [], paid: [], paidAmounts: [], bankNames: [], bankAccounts: [] };
     saveState(); render();
   }
 });
 
-render();
+(function () {
+  "use strict";
+
+  var SUPABASE_URL      = "https://hrluapuldjkvtosraoow.supabase.co";
+  var SUPABASE_ANON_KEY = "sb_publishable_mhUQ1P1hdyo--oPafwnJzQ_JPWvA9LT";
+  var STATE_ID          = "split-bill-dashboard";
+  var PUSH_DELAY_MS     = 900;
+
+  if (!window.supabase || !window.supabase.createClient) {
+    console.error("[sync] supabase-js not loaded — falling back to local-only mode");
+    bootLocalOnly();
+    return;
+  }
+
+  var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  var pushTimer = null;
+  var ready = false;
+
+  function badge(text, kind) {
+    var b = document.getElementById("cloudSyncBadge");
+    if (!b) {
+      b = document.createElement("div");
+      b.id = "cloudSyncBadge";
+      document.body.appendChild(b);
+    }
+    b.textContent = text;
+    if (kind === "ok")      { b.style.background = "#e6f7ec"; b.style.color = "#1f9d55"; }
+    else if (kind === "err"){ b.style.background = "#fdeceb"; b.style.color = "#e0433d"; }
+    else                    { b.style.background = "#ececec"; b.style.color = "#707070"; }
+    b.style.opacity = "1";
+    if (kind === "ok") setTimeout(function () { b.style.opacity = "0"; }, 1800);
+  }
+
+  function pullRemoteState() {
+    return sb.from("app_state").select("data").eq("id", STATE_ID).maybeSingle();
+  }
+
+  function doPush() {
+    if (!ready || !state) return Promise.resolve();
+    badge("Saving...", "idle");
+    return sb.auth.getUser().then(function (u) {
+      return sb.from("app_state").upsert({
+        id: STATE_ID,
+        data: state,
+        updated_at: new Date().toISOString(),
+        updated_by: u && u.data && u.data.user ? u.data.user.email : null
+      });
+    }).then(function (res) {
+      if (res && res.error) {
+        console.error("[sync] push failed", res.error);
+        badge("Sync error", "err");
+      } else {
+        badge("Synced", "ok");
+      }
+    });
+  }
+  function push() { pushTimer = null; doPush(); }
+  function schedulePush() {
+    clearTimeout(pushTimer);
+    pushTimer = setTimeout(push, PUSH_DELAY_MS);
+  }
+  function flushPendingPush() {
+    if (pushTimer === null) return Promise.resolve();
+    clearTimeout(pushTimer);
+    pushTimer = null;
+    return doPush();
+  }
+
+  window.saveState = function () {
+    saveStateLocal();
+    schedulePush();
+  };
+
+  function start() {
+    badge("Loading...", "idle");
+    pullRemoteState().then(function (res) {
+      if (res.error) {
+        console.error("[sync] pull failed", res.error);
+        badge("Cannot connect", "err");
+        state = loadStateLocal() || buildSample();
+        normalizeState();
+        ready = true;
+        render();
+        return;
+      }
+      if (!res.data) {
+        state = loadStateLocal() || buildSample();
+        normalizeState();
+        ready = true;
+        render();
+        push();
+      } else {
+        state = res.data.data;
+        normalizeState();
+        ready = true;
+        render();
+        badge("Synced", "ok");
+      }
+      hookVisibilitySync();
+      // No login system anymore — everyone with the link shares the same
+      // data automatically, so there's no per-user identity to show and
+      // no separate "sign out" action needed. The Sign out button is
+      // hidden entirely (see below) instead of wired to anything.
+      var statusBtn = document.getElementById("syncStatusBtn");
+      if (statusBtn) statusBtn.textContent = "🌐 Shared with anyone who has this link";
+      var soBtn = document.getElementById("signOutBtn");
+      if (soBtn) soBtn.style.display = "none";
+    });
+  }
+
+  function hookVisibilitySync() {
+    document.addEventListener("visibilitychange", function () {
+      if (document.visibilityState !== "visible") return;
+      flushPendingPush().then(function () {
+        return pullRemoteState();
+      }).then(function (r) {
+        if (!r || r.error || !r.data) return;
+        if (JSON.stringify(r.data.data || {}) !== JSON.stringify(state)) {
+          state = r.data.data;
+          normalizeState();
+          render();
+          badge("Updated", "ok");
+        }
+      });
+    });
+    window.addEventListener("beforeunload", function () { doPush(); });
+  }
+
+  function bootLocalOnly() {
+    state = loadStateLocal() || buildSample();
+    normalizeState();
+    window.saveState = saveStateLocal;
+    render();
+    var statusBtn = document.getElementById("syncStatusBtn");
+    if (statusBtn) statusBtn.textContent = "⚠️ Local only (cloud sync unavailable)";
+    var so = document.getElementById("signOutBtn");
+    if (so) so.style.display = "none";
+  }
+
+  // No login required anymore — connect straight to the shared cloud data.
+  // Anyone who opens this page (with this exact HTML file / URL) sees and
+  // can edit the same live numbers immediately.
+  start();
+})();
 </script>
 </body>
 </html>
