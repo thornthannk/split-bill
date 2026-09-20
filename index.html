@@ -624,7 +624,7 @@ const I18N = {
     settleHeader: "\uD83D\uDD04 Settle Up \u2014 Who Transfers to Whom",
     footerText: "SplitEase \u00B7 edits are saved automatically in this browser",
     paidStatus: "\u2705 Paid",
-    notPaidStatus: "\u25FB\uFE0F Not paid",
+    notPaidStatus: "❌ Not paid",
     getsBack: "gets back",
     owesLabel: "owes",
     settledLabel: "settled",
@@ -693,7 +693,7 @@ const I18N = {
     settleHeader: "\uD83D\uDD04 \u0E40\u0E04\u0E25\u0E35\u0E22\u0E23\u0E4C\u0E40\u0E07\u0E34\u0E19 \u2014 \u0E43\u0E04\u0E23\u0E42\u0E2D\u0E19\u0E43\u0E2B\u0E49\u0E43\u0E04\u0E23",
     footerText: "SplitEase \u00B7 \u0E01\u0E32\u0E23\u0E41\u0E01\u0E49\u0E44\u0E02\u0E08\u0E30\u0E16\u0E39\u0E01\u0E1A\u0E31\u0E19\u0E17\u0E36\u0E01\u0E2D\u0E31\u0E15\u0E42\u0E19\u0E21\u0E31\u0E15\u0E34\u0E43\u0E19\u0E40\u0E1A\u0E23\u0E32\u0E27\u0E4C\u0E40\u0E0B\u0E2D\u0E23\u0E4C\u0E19\u0E35\u0E49",
     paidStatus: "\u2705 \u0E08\u0E48\u0E32\u0E22\u0E41\u0E25\u0E49\u0E27",
-    notPaidStatus: "\u25FB\uFE0F \u0E22\u0E31\u0E07\u0E44\u0E21\u0E48\u0E08\u0E48\u0E32\u0E22",
+    notPaidStatus: "❌ ยังไม่จ่าย",
     getsBack: "\u0E44\u0E14\u0E49\u0E40\u0E07\u0E34\u0E19\u0E04\u0E37\u0E19",
     owesLabel: "\u0E15\u0E34\u0E14\u0E40\u0E07\u0E34\u0E19",
     settledLabel: "\u0E40\u0E23\u0E35\u0E22\u0E1A\u0E23\u0E49\u0E2D\u0E22\u0E41\u0E25\u0E49\u0E27",
@@ -1391,7 +1391,10 @@ function buildViewOnlySnapshot(){
           ? `<div class="settle-bank-row">
               <label>${t("transferTo")} ${escapeHtml(tx.to)}:</label>
               <span>${escapeHtml(bankName || "—")}</span>
-              <span>${escapeHtml(bankAcc || "—")}</span>
+              <div class="acc-number-wrap">
+                <span class="acc-number-input" style="display:flex;align-items:center;">${escapeHtml(bankAcc || "—")}</span>
+                ${bankAcc ? `<button type="button" class="copy-acc-btn" data-copy="${escapeAttr(bankAcc)}">${t("copyBtn")}</button>` : ""}
+              </div>
             </div>`
           : "";
         return `<div class="settle-row">
@@ -1486,6 +1489,47 @@ ${styleBlock}
   </div>
   <footer>${generatedLine}</footer>
 </div>
+<` + `script>
+  // The exported "View Only" file is a fully standalone HTML document
+  // (opened directly by the recipient, with no connection back to this
+  // live dashboard's own JavaScript), so the Copy button here needs its
+  // own small self-contained click handler baked into the exported file
+  // itself \u2014 this lets a friend receiving the file copy the bank
+  // account number straight to their clipboard to make the transfer,
+  // without needing to manually select/copy the text by hand.
+  document.querySelectorAll(".copy-acc-btn").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      var value = btn.getAttribute("data-copy") || "";
+      if(!value) return;
+      var original = btn.textContent;
+      var done = function(){
+        btn.classList.add("copied");
+        btn.textContent = "\u2705";
+        setTimeout(function(){
+          btn.classList.remove("copied");
+          btn.textContent = original;
+        }, 1200);
+      };
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(value).then(done).catch(function(){
+          var ta = document.createElement("textarea");
+          ta.value = value; ta.style.position = "fixed"; ta.style.opacity = "0";
+          document.body.appendChild(ta); ta.focus(); ta.select();
+          try{ document.execCommand("copy"); }catch(e){}
+          document.body.removeChild(ta);
+          done();
+        });
+      } else {
+        var ta = document.createElement("textarea");
+        ta.value = value; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.focus(); ta.select();
+        try{ document.execCommand("copy"); }catch(e){}
+        document.body.removeChild(ta);
+        done();
+      }
+    });
+  });
+<` + `/script>
 </body>
 </html>`;
 }
