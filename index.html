@@ -765,9 +765,9 @@ function buildSample(){
     { name: "Water",        qty: 3, cost: 180,  consumed: [true, true, true], discountType: "percent", discountValue: 0 },
     { name: "Ice",          qty: 1, cost: 100,  consumed: [true, true, true], discountType: "percent", discountValue: 0 },
     { name: "Coke",         qty: 1, cost: 60,   consumed: [true, true, true], discountType: "percent", discountValue: 0 },
-    { name: "ยำวุ้นเส้น",    qty: 1, cost: 220,  consumed: [true, false, false], discountType: "percent", discountValue: 0 }
+    { name: "Food",    qty: 1, cost: 220,  consumed: [true, false, false], discountType: "percent", discountValue: 0 }
   ];
-  const members = ["Bom", "Tae", "Whaa"];
+  const members = ["A", "B", "C"];
   const totalVAT = items.reduce((s, item) => {
     const costSC = item.cost * (1 + scPercent / 100);
     const costVAT = costSC * (1 + vatPercent / 100);
@@ -1569,6 +1569,7 @@ function buildTextSummary(){
   // a plain product-name line reads more like a signature/header than a
   // repeated "Summary" label.
   lines.push("🧾 SplitEase");
+  lines.push("");
   // Line 2: the restaurant/shop name (if the user filled it in). Always
   // emit this line (even if blank) so the summary always has a
   // predictable 3-line header block: brand, place, date.
@@ -1605,14 +1606,19 @@ function buildTextSummary(){
   if(transactions.length === 0){
     lines.push(t("allSettled"));
   } else {
-    transactions.forEach(tx => {
+    transactions.forEach((tx, txIdx) => {
       let line = tx.from + " ➣ " + tx.to + ": " + fmt(tx.amount);
       const bankName = state.bankNames[tx.toIdx] || "";
       const bankAcc = state.bankAccounts[tx.toIdx] || "";
       if(bankName || bankAcc){
-        line += "\n   " + t("summaryBank") + ": " + [bankName, bankAcc].filter(Boolean).join(" ");
+        line += "\n" + t("summaryBank") + ": " + [bankName, bankAcc].filter(Boolean).join(" ");
       }
       lines.push(line);
+      // Blank line between each transaction+bank block (but not after the
+      // very last one — the existing lines.push("") right after this
+      // forEach already provides the trailing gap before the Paid Upfront
+      // check line).
+      if(txIdx < transactions.length - 1) lines.push("");
     });
   }
   lines.push("");
