@@ -1,43 +1,1646 @@
-<!doctype html>
-<html lang="th">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Split Bill Dashboard</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SplitEase</title>
 <style>
-:root{--bg:#f3f3f3;--card:#fff;--line:#ddd;--ink:#1d1d1f;--muted:#747474;--dark:#202020;--green:#16844f;--red:#c33;--soft:#eee;--r:12px}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Noto Sans Thai",sans-serif;padding:28px 22px 70px}.wrap{max-width:1240px;margin:auto}.top{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;flex-wrap:wrap;margin-bottom:22px}.top h1{margin:0;font-size:26px}.top p{margin:5px 0 0;color:var(--muted);font-size:13px}.actions,.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:19px 21px;margin-bottom:18px;box-shadow:0 2px 5px #0000000a}.card h2{margin:0 0 14px;font-size:16px}.btn{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:8px;padding:9px 13px;font-weight:650;cursor:pointer}.btn:hover{background:#f6f6f6;border-color:#aaa}.btn.primary{background:var(--dark);border-color:var(--dark);color:#fff}.btn.danger{color:var(--red)}label{display:grid;gap:5px;color:var(--muted);font-size:11px;font-weight:750;text-transform:uppercase;letter-spacing:.04em}input,select{font:inherit;color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:8px;background:#fff}input[type=number]{width:100px;-moz-appearance:textfield}input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}.settings{display:flex;gap:20px;flex-wrap:wrap}.table-wrap{overflow:auto;border-radius:9px}table{width:100%;min-width:940px;border-collapse:collapse;font-size:13px}th{background:var(--dark);color:#fff;text-transform:uppercase;letter-spacing:.04em;font-size:10px;padding:10px 8px;text-align:left;white-space:nowrap}td{border-bottom:1px solid var(--line);padding:7px 8px;vertical-align:middle}tbody tr:hover{background:#fafafa}td input[type=text],td input[type=number],td select{width:100%;min-width:68px;border-color:transparent;background:transparent;padding:6px}td input:focus,td select:focus{outline:none;border-color:#999;background:#fff}.center{text-align:center}.member-head input{width:90px;background:#fff;color:#111;text-align:center;font-weight:700}.tiny{border:0;background:transparent;color:var(--red);cursor:pointer;font-size:11px}.readonly{white-space:nowrap;color:#555}.neg{color:var(--red)!important}.pos{color:var(--green)!important}.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}.person{border:1px solid var(--line);border-radius:10px;padding:14px}.person b{display:block}.person strong{display:block;font-size:21px;margin:5px 0}.paid{display:inline-block;border:1px solid var(--line);padding:4px 10px;border-radius:20px;font-size:11px;cursor:pointer}.paid.yes{background:var(--dark);color:#fff}.grand{display:flex;justify-content:space-between;border-top:1px dashed var(--line);padding-top:12px;margin-top:14px;color:var(--muted)}.grand strong{color:var(--ink);font-size:18px}.settle{border:1px solid var(--line);border-radius:10px;padding:12px 13px;background:#fafafa;margin:8px 0}.settle-main{display:flex;gap:9px;align-items:center}.settle-main .amount{margin-left:auto;font-weight:800;background:var(--soft);padding:4px 9px;border-radius:6px}.bank{display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-top:1px dashed var(--line);padding-top:9px;margin-top:9px}.bank select{min-width:230px}.bank input{width:180px}.copy{border:1px solid var(--line);background:var(--soft);border-radius:7px;padding:8px;cursor:pointer}.note{font-size:11px;color:var(--muted);margin-top:10px}.empty{text-align:center;padding:16px;color:var(--muted);background:var(--soft);border-radius:9px}footer{text-align:center;color:var(--muted);font-size:11px;margin:25px}.view-banner{padding:10px;background:#eee;border:1px solid #ddd;border-radius:9px;font-weight:700;margin-bottom:15px}@media(max-width:680px){body{padding:16px 10px 55px}.card{padding:15px}.top h1{font-size:22px}}
+  :root{
+    --bg:#f2f2f2;
+    --card:#ffffff;
+    --border:#dcdcdc;
+    --text:#1c1c1c;
+    --muted:#707070;
+    --accent:#1f1f1f;
+    --accent-soft:#ececec;
+    --chip-light:#ececec;
+    --chip-dark:#c9c9c9;
+    --green:#1f9d55;
+    --green-soft:#e6f7ec;
+    --red:#e0433d;
+    --red-soft:#fdeceb;
+    --radius:12px;
+    --shadow:0 1px 2px rgba(0,0,0,.04), 0 1px 3px rgba(0,0,0,.06);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    padding:32px 24px 80px;
+  }
+  .wrap{max-width:1220px;margin:0 auto;}
+  header.top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:24px;
+    flex-wrap:wrap;
+    gap:12px;
+  }
+  header.top h1{
+    font-size:24px;
+    margin:0;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  header.top p{margin:4px 0 0;color:var(--muted);font-size:13.5px;}
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:20px 22px;
+    margin-bottom:20px;
+  }
+  .card h2{
+    font-size:15px;
+    margin:0 0 14px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:var(--text);
+  }
+  .settings-row{
+    display:flex;
+    gap:28px;
+    flex-wrap:wrap;
+  }
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+  }
+  .field label{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.03em;}
+  .field .input-suffix{
+    display:flex;align-items:center;
+    border:1px solid var(--border);
+    border-radius:8px;
+    overflow:hidden;
+    width:120px;
+  }
+  .field input{
+    border:none;
+    outline:none;
+    padding:8px 10px;
+    font-size:14px;
+    width:100%;
+    color:var(--text);
+  }
+  .field .suffix{
+    padding:0 10px;
+    background:#f7f7f7;
+    color:var(--muted);
+    font-size:13px;
+    border-left:1px solid var(--border);
+  }
+  .table-scroll{overflow-x:auto;border-radius:10px;}
+  table{
+    border-collapse:collapse;
+    width:100%;
+    min-width:780px;
+    font-size:13.5px;
+  }
+  thead th{
+    background:var(--accent);
+    color:#ffffff;
+    font-weight:600;
+    font-size:11.5px;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    padding:10px 10px;
+    border-bottom:1px solid var(--border);
+    text-align:left;
+    white-space:nowrap;
+  }
+  thead th.member-col{text-align:center;}
+  tbody td{
+    padding:6px 8px;
+    border-bottom:1px solid var(--border);
+    vertical-align:middle;
+  }
+  tbody tr:hover{background:#fafafa;}
+  td.member-col, th.member-col{text-align:center;}
+  td input[type="text"], td input[type="number"]{
+    border:1px solid transparent;
+    background:transparent;
+    padding:6px 7px;
+    border-radius:6px;
+    font-size:13.5px;
+    width:100%;
+    color:var(--text);
+  }
+  td input[type="number"]{width:90px;}
+  td input.item-disc-value{width:66px;}
+  td input.item-disc-value.has-discount{color:var(--red);font-weight:600;}
+  td select.item-disc-type{
+    border:1px solid transparent;
+    background:transparent;
+    padding:6px 4px;
+    border-radius:6px;
+    font-size:13px;
+    width:60px;
+    color:var(--text);
+    cursor:pointer;
+  }
+  td select.item-disc-type:hover, td select.item-disc-type:focus{
+    border:1px solid var(--border);
+    background:#fff;
+    outline:none;
+  }
+  td select.item-disc-type:focus{border-color:var(--accent);}
+  td input[type="text"]:hover, td input[type="number"]:hover,
+  td input[type="text"]:focus, td input[type="number"]:focus{
+    border:1px solid var(--border);
+    background:#fff;
+    outline:none;
+  }
+  td input[type="text"]:focus, td input[type="number"]:focus{
+    border-color:var(--accent);
+  }
+  input[type="number"]{ -moz-appearance:textfield; }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button{
+    -webkit-appearance:none;
+    margin:0;
+  }
+  input[type="checkbox"]{
+    width:17px;height:17px;
+    accent-color:var(--accent);
+    cursor:pointer;
+  }
+  .readonly-val{
+    padding:6px 7px;
+    color:var(--muted);
+    white-space:nowrap;
+  }
+  .discount-val{color:var(--muted);}
+  .discount-val.has-discount, .total-discount-val.has-discount{color:var(--red);}
+  .member-name-input{
+    text-align:center;
+    font-weight:600;
+    width:88px !important;
+  }
+  .remove-member-btn{
+    display:block;
+    margin:4px auto 0;
+    border:none;
+    background:none;
+    color:var(--red);
+    font-size:11px;
+    cursor:pointer;
+    opacity:.65;
+  }
+  .remove-member-btn:hover{opacity:1;text-decoration:underline;}
+  .icon-btn{
+    border:none;
+    background:none;
+    cursor:pointer;
+    color:var(--muted);
+    font-size:16px;
+    padding:4px 8px;
+    border-radius:6px;
+    line-height:1;
+  }
+  .icon-btn:hover{background:var(--chip-dark);color:var(--text);}
+  tfoot td{
+    padding:10px 8px;
+    font-weight:700;
+    border-top:2px solid var(--accent);
+    background:var(--accent-soft);
+  }
+  .btn{
+    border:1px solid var(--border);
+    background:#fff;
+    color:var(--text);
+    padding:8px 14px;
+    border-radius:8px;
+    font-size:13.5px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    transition:.15s;
+  }
+  .btn:hover{border-color:var(--accent);color:var(--text);background:#f5f5f5;}
+  .btn.primary{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  .btn.primary:hover{background:#000;color:#fff;}
+  .toolbar{
+    display:flex;
+    gap:10px;
+    margin-top:16px;
+    flex-wrap:wrap;
+  }
+  .summary-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:14px;
+  }
+  .summary-card{
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:14px 16px;
+    background:#fff;
+    position:relative;
+  }
+  .summary-card .name{font-weight:700;font-size:14.5px;margin-bottom:4px;}
+  .summary-card .amount{font-size:20px;font-weight:700;color:var(--text);}
+  .summary-card .status{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    font-size:12px;
+    margin-top:8px;
+    padding:3px 10px;
+    border-radius:20px;
+    cursor:pointer;
+    user-select:none;
+    font-weight:600;
+  }
+  .status.paid{background:var(--accent);color:#fff;}
+  .status.unpaid{background:#fff;color:var(--muted);border:1px solid var(--border);}
+  .note{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:10px;
+    font-style:italic;
+  }
+  .grand-total{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding-top:10px;
+    margin-top:6px;
+    border-top:1px dashed var(--border);
+    font-size:13.5px;
+    color:var(--muted);
+  }
+  .grand-total b{color:var(--text);font-size:16px;}
+  .balance-val{font-weight:700;padding:3px 9px;border-radius:6px;white-space:nowrap;}
+  .balance-val.positive{color:var(--green);background:var(--green-soft);}
+  .balance-val.negative{color:var(--red);background:var(--red-soft);}
+  .balance-val.zero{color:var(--muted);background:transparent;}
+  .settle-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:12px 14px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    margin-bottom:8px;
+    background:#fafafa;
+    flex-wrap:wrap;
+  }
+  .settle-row .settle-from{font-weight:700;color:var(--red);}
+  .settle-row .settle-to{font-weight:700;color:var(--green);}
+  .settle-row .settle-arrow{color:var(--muted);font-size:15px;}
+  .settle-row .settle-amount{
+    margin-left:auto;
+    font-weight:700;
+    color:var(--text);
+    font-size:14.5px;
+    background:var(--chip-light);
+    padding:3px 10px;
+    border-radius:6px;
+  }
+  .all-settled{
+    padding:14px;
+    text-align:center;
+    color:var(--text);
+    font-weight:600;
+    background:var(--chip-light);
+    border-radius:10px;
+  }
+  .paid-check{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-top:12px;
+    padding:12px 14px;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:600;
+    flex-wrap:wrap;
+  }
+  .paid-check.ok{
+    background:var(--green-soft);
+    color:var(--green);
+  }
+  .paid-check.mismatch{
+    background:var(--red-soft);
+    color:var(--red);
+  }
+  .paid-check .diff-amt{
+    margin-left:auto;
+    font-weight:700;
+    white-space:nowrap;
+  }
+  .settle-top-line{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    width:100%;
+  }
+  .settle-bank-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    width:100%;
+    margin-top:8px;
+    padding-top:8px;
+    border-top:1px dashed var(--border);
+    flex-wrap:wrap;
+  }
+  .settle-bank-row label{
+    font-size:11.5px;
+    color:var(--muted);
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:.02em;
+  }
+  .bank-select{
+    border:1px solid var(--border);
+    border-radius:7px;
+    padding:6px 8px;
+    font-size:13px;
+    background:#fff;
+    color:var(--text);
+    min-width:170px;
+  }
+  .bank-select:focus{outline:none;border-color:var(--accent);}
+  .acc-number-input{
+    border:1px solid var(--border);
+    border-radius:7px;
+    padding:6px 9px;
+    font-size:13px;
+    background:#fff;
+    color:var(--text);
+    width:170px;
+    letter-spacing:.02em;
+  }
+  .acc-number-input:focus{outline:none;border-color:var(--accent);}
+  .acc-number-input::placeholder{color:#bdbdbd;}
+  .acc-number-wrap{
+    display:flex;
+    align-items:stretch;
+    gap:0;
+  }
+  .acc-number-wrap .acc-number-input{
+    border-radius:7px 0 0 7px;
+    border-right:none;
+  }
+  .copy-acc-btn{
+    border:1px solid var(--border);
+    border-left:none;
+    border-radius:0 7px 7px 0;
+    background:var(--accent-soft);
+    color:var(--text);
+    cursor:pointer;
+    padding:0 10px;
+    font-size:13px;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    transition:.15s;
+    white-space:nowrap;
+  }
+  .copy-acc-btn:hover{background:var(--accent);color:#fff;}
+  .copy-acc-btn.copied{background:var(--text);color:#fff;border-color:var(--text);}
+  .promptpay-badge{
+    display:inline-block;
+    font-size:11px;
+    font-weight:700;
+    color:var(--text);
+    background:var(--chip-light);
+    padding:2px 7px;
+    border-radius:6px;
+    margin-left:6px;
+  }
+  footer{
+    text-align:center;
+    color:var(--muted);
+    font-size:12px;
+    margin-top:28px;
+  }
+  @media (max-width:640px){
+    body{padding:18px 12px 60px;}
+    .card{padding:16px;}
+  }
+  .view-only-banner{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--accent-soft);
+    color:var(--text);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:10px 14px;
+    font-size:13px;
+    font-weight:600;
+    margin-bottom:20px;
+  }
+  .view-only .member-col input[type="checkbox"]{
+    pointer-events:none;
+  }
+  .view-only .status{cursor:default;}
 </style>
 </head>
 <body>
 <div class="wrap">
-<header class="top"><div><h1>🧾 Split Bill Dashboard</h1><p>ข้อมูลจะบันทึกใน Browser ของแต่ละคน ไม่ Sync ข้ามเครื่อง</p></div><div class="actions"><button class="btn primary" id="shareBtn">🔗 Share View Only</button><button class="btn" id="resetBtn">↺ Reset sample</button><button class="btn danger" id="clearBtn">🗑 Clear all</button></div></header>
-<section class="card"><h2>⚙️ Charges</h2><div class="settings"><label>Service Charge<div><input id="service" type="number" min="0" step=".1"> %</div></label><label>VAT<div><input id="vat" type="number" min="0" step=".1"> %</div></label><label>Currency<input id="currency" maxlength="3" style="width:80px"></label></div></section>
-<section class="card"><h2>🍽️ Menu & Split</h2><div class="table-wrap"><table><thead><tr id="menuHead"><th>Menu</th><th>Qty</th><th>Cost</th><th>Disc.</th><th>Type</th><th>Discount</th><th>With SC</th><th>With VAT</th><th>Cost / Head</th><th></th></tr></thead><tbody id="menuBody"></tbody><tfoot id="menuFoot"></tfoot></table></div><div class="actions" style="margin-top:13px"><button class="btn primary" id="addItem">+ Add Item</button><button class="btn" id="addPerson">+ Add Person</button></div><div class="note">ส่วนลดตั้งแยกต่อเมนูได้ ก่อนคำนวณ Service Charge และ VAT</div></section>
-<section class="card"><h2>👥 Who Owes What</h2><div id="summary" class="summary"></div><div class="grand"><span>Grand Total</span><strong id="grand"></strong></div></section>
-<section class="card"><h2>💵 Who Paid First</h2><div class="table-wrap"><table style="min-width:560px"><thead><tr><th>Person</th><th>Paid Upfront</th><th>Their Share</th><th>Balance</th></tr></thead><tbody id="paidBody"></tbody></table></div></section>
-<section class="card"><h2>🔄 Settle Up</h2><div id="settlements"></div></section>
-<footer>Split Bill Dashboard · localStorage only · each browser keeps its own data</footer>
+  <header class="top">
+    <div>
+      <h1>🧾 SplitEase</h1>
+      <p data-i18n="subtitle">Add items, add people, tick who shared what — totals update automatically.</p>
+    </div>
+    <div class="toolbar">
+      <button class="btn" id="langBtn" data-i18n="langBtnLabel">🌐 EN</button>
+      <button class="btn primary" id="shareViewBtn" data-i18n="shareBtn">🔗 Share (View Only)</button>
+      <button class="btn" id="copySummaryBtn" data-i18n="copySummaryBtn">📋 Copy Summary</button>
+      <button class="btn" id="resetBtn" data-i18n="resetBtn">↺ Reset to sample</button>
+      <button class="btn" id="clearBtn" data-i18n="clearBtn">🗑 Clear all</button>
+    </div>
+  </header>
+  <div class="card">
+    <h2 data-i18n="tripDetailsHeader">📝 Trip Details</h2>
+    <div class="settings-row">
+      <div class="field" style="flex:1;min-width:200px;">
+        <label data-i18n="restaurantNameLabel">Restaurant Name</label>
+        <div class="input-suffix" style="width:100%;">
+          <input type="text" id="restaurantName" data-i18n-placeholder="restaurantNamePlaceholder" placeholder="e.g. Regency Restaurant">
+        </div>
+      </div>
+      <div class="field">
+        <label data-i18n="diningDateLabel">Date</label>
+        <div class="input-suffix" style="width:170px;">
+          <input type="date" id="diningDate">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h2 data-i18n="chargesHeader">⚙️ Charges</h2>
+    <div class="settings-row">
+      <div class="field">
+        <label data-i18n="serviceCharge">Service Charge</label>
+        <div class="input-suffix">
+          <input type="number" id="scPercent" step="0.1" min="0">
+          <span class="suffix">%</span>
+        </div>
+      </div>
+      <div class="field">
+        <label data-i18n="vatLabel">VAT</label>
+        <div class="input-suffix">
+          <input type="number" id="vatPercent" step="0.1" min="0">
+          <span class="suffix">%</span>
+        </div>
+      </div>
+      <div class="field">
+        <label data-i18n="currencySymbol">Currency Symbol</label>
+        <div class="input-suffix" style="width:90px">
+          <input type="text" id="currencySymbol" maxlength="3">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h2 data-i18n="menuHeader">🍽️ Menu & Split</h2>
+    <div class="table-scroll">
+      <table id="billTable">
+        <thead>
+          <tr id="headerRow">
+            <th style="min-width:140px;" data-i18n="thMenu">Menu</th>
+            <th style="min-width:70px;" data-i18n="thQty">Qty</th>
+            <th data-i18n="thCostExcl">Cost w/o SC & VAT</th>
+            <th style="min-width:70px;" data-i18n="thDiscValue">Disc. Value</th>
+            <th style="min-width:65px;" data-i18n="thDiscType">Disc. Type</th>
+            <th data-i18n="thDiscount">Discount</th>
+            <th data-i18n="thCostSC">Cost w/ SC</th>
+            <th data-i18n="thCostVAT">Cost w/ VAT</th>
+            <th style="min-width:90px;" data-i18n="thCostHead">Cost/Head</th>
+            <th style="width:36px;"></th>
+          </tr>
+        </thead>
+        <tbody id="itemsBody"></tbody>
+        <tfoot id="tableFoot"></tfoot>
+      </table>
+    </div>
+    <div class="toolbar">
+      <button class="btn primary" id="addItemBtn" data-i18n="addItem">+ Add Item</button>
+      <button class="btn" id="addMemberBtn" data-i18n="addPerson">+ Add Person</button>
+    </div>
+    <div class="note" data-i18n="noteText">* Discount can be set per item — leave it at 0 for items with no discount. Choose "%" to discount that item by a percentage, or "฿ Fixed" to knock a flat baht amount off just that item. Discount is applied before Service Charge and VAT. Cost/Head splits that item's Cost w/ VAT evenly across everyone checked in that row.</div>
+  </div>
+  <div class="card">
+    <h2 data-i18n="whoOwesHeader">👥 Who Owes What</h2>
+    <div class="summary-grid" id="summaryGrid"></div>
+    <div class="grand-total">
+      <span data-i18n="grandTotalLabel">Grand Total (all items, incl. discount + SC + VAT)</span>
+      <b id="grandTotal">฿0.00</b>
+    </div>
+  </div>
+  <div class="card">
+    <h2 data-i18n="whoPaidHeader">💵 Who Paid First</h2>
+    <div class="table-scroll">
+      <table id="paidTable">
+        <thead>
+          <tr>
+            <th style="min-width:120px;" data-i18n="thPerson">Person</th>
+            <th style="min-width:140px;" data-i18n="thAmountPaid">Amount Paid Upfront</th>
+            <th data-i18n="thTheirShare">Their Share</th>
+            <th data-i18n="thBalance">Balance</th>
+          </tr>
+        </thead>
+        <tbody id="paidBody"></tbody>
+      </table>
+    </div>
+    <div class="note" data-i18n="paidNote">Enter how much each person actually paid at the restaurant (e.g. whoever paid the bill by card). Balance = Amount Paid − Their Share: ▲ means they should get money back, ▼ means they still owe.</div>
+    <div id="paidCheckBox" class="paid-check"></div>
+  </div>
+  <div class="card">
+    <h2 data-i18n="settleHeader">🔄 Settle Up — Who Transfers to Whom</h2>
+    <div id="settleList"></div>
+  </div>
+  <footer data-i18n="footerText">SplitEase · edits are saved automatically in this browser</footer>
 </div>
 <script>
-'use strict';
-const KEY='splitBillDashboardState_v5';
-const METHODS=['พร้อมเพย์ (PromptPay)','ธนาคารกรุงเทพ (Bangkok Bank)','ธนาคารกสิกรไทย (Kasikornbank)','ธนาคารกรุงไทย (Krungthai Bank)','ธนาคารทหารไทยธนชาต (ttb)','ธนาคารไทยพาณิชย์ (SCB)','ธนาคารกรุงศรีอยุธยา (Krungsri)','ธนาคารเกียรตินาคินภัทร (KKP)','ธนาคารซีไอเอ็มบี ไทย (CIMB Thai)','ธนาคารทิสโก้ (TISCO)','ธนาคารยูโอบี (UOB)','ธนาคารไทยเครดิต (Thai Credit Bank)','ธนาคารแลนด์ แอนด์ เฮ้าส์ (LH Bank)','ธนาคารไอซีบีซี (ไทย) (ICBC Thai)','ธนาคารออมสิน (GSB)','ธนาคารอาคารสงเคราะห์ (GH Bank)','ธนาคารเพื่อการเกษตรและสหกรณ์การเกษตร (BAAC)'];
-const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const r2=n=>Math.round((Number(n)||0)*100)/100;
-function sample(){const people=['Bom','Tae','Whaa'];const items=[['Regency',1,1350,[1,1,1]],['Soda',3,180,[1,1,1]],['Water',3,180,[1,1,1]],['Ice',1,100,[1,1,1]],['Coke',1,60,[1,1,1]],['ยำวุ้นเส้น',1,220,[1,0,0]]].map(x=>({name:x[0],qty:x[1],cost:x[2],consumed:x[3].map(Boolean),discountValue:0,discountType:'percent'}));return{service:10,vat:7,currency:'฿',people,items,paid:people.map((_,i)=>i===0?2448.36:0),paidFlags:people.map(()=>false),banks:people.map(()=>''),accounts:people.map(()=>''),updated:new Date().toISOString()}}
-function load(){try{const x=JSON.parse(localStorage.getItem(KEY));if(x&&Array.isArray(x.people)&&Array.isArray(x.items))return x}catch(e){}return sample()}
-let state=load();
-function normalize(){state.service=Number(state.service??state.scPercent??10);state.vat=Number(state.vat??state.vatPercent??7);state.currency=state.currency??state.currencySymbol??'฿';state.people=state.people??state.members??[];state.paid=state.paidAmounts??state.paid??state.people.map(()=>0);state.paidFlags=state.paidFlags??(Array.isArray(state.paid)&&typeof state.paid[0]==='boolean'?state.paid:state.people.map(()=>false));if(typeof state.paid[0]==='boolean')state.paid=state.people.map(()=>0);state.banks=state.banks??state.bankNames??state.people.map(()=>'');state.accounts=state.accounts??state.bankAccounts??state.people.map(()=>'');for(const a of ['paid','paidFlags','banks','accounts'])while(state[a].length<state.people.length)state[a].push(a==='paid'?0:a==='paidFlags'?false:'');state.items.forEach(i=>{i.discountValue=Number(i.discountValue||0);i.discountType=i.discountType==='amount'?'amount':'percent';i.consumed=Array.isArray(i.consumed)?i.consumed:state.people.map(()=>false);while(i.consumed.length<state.people.length)i.consumed.push(false)})}
-normalize();
-function save(){state.updated=new Date().toISOString();localStorage.setItem(KEY,JSON.stringify(state))}
-function money(n){return state.currency+Number(n||0).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}
-function calc(i){const base=Number(i.cost)||0;const dv=Math.max(0,Number(i.discountValue)||0);const discount=i.discountType==='amount'?Math.min(base,dv):Math.min(base,base*dv/100);const net=Math.max(0,base-discount);const sc=net*(1+state.service/100);const total=sc*(1+state.vat/100);const count=i.consumed.filter(Boolean).length;return{discount,sc,total,per:count?total/count:0}}
-function totals(){const rows=state.items.map(calc);const shares=state.people.map((_,p)=>state.items.reduce((s,i,n)=>s+(i.consumed[p]?rows[n].per:0),0));return{rows,shares,grand:rows.reduce((s,x)=>s+x.total,0),base:state.items.reduce((s,x)=>s+(Number(x.cost)||0),0),discount:rows.reduce((s,x)=>s+x.discount,0),sc:rows.reduce((s,x)=>s+x.sc,0)}}
-function transactions(shares){const cr=[],db=[];state.people.forEach((name,i)=>{const b=r2((Number(state.paid[i])||0)-shares[i]);if(b>.01)cr.push({name,i,a:b});else if(b<-.01)db.push({name,i,a:-b})});cr.sort((a,b)=>b.a-a.a);db.sort((a,b)=>b.a-a.a);const out=[];let c=0,d=0;while(c<cr.length&&d<db.length){const a=r2(Math.min(cr[c].a,db[d].a));if(a>.01)out.push({from:db[d].name,to:cr[c].name,toIdx:cr[c].i,amount:a});cr[c].a=r2(cr[c].a-a);db[d].a=r2(db[d].a-a);if(cr[c].a<=.01)c++;if(db[d].a<=.01)d++}return out}
-function render(){normalize();document.getElementById('service').value=state.service;document.getElementById('vat').value=state.vat;document.getElementById('currency').value=state.currency;const h=document.getElementById('menuHead');h.querySelectorAll('.personH').forEach(x=>x.remove());const anchor=h.children[h.children.length-2];state.people.forEach((p,n)=>{const th=document.createElement('th');th.className='personH member-head center';th.innerHTML=`<input data-person="${n}" value="${esc(p)}"><button class="tiny" data-remove-person="${n}">remove</button>`;h.insertBefore(th,anchor)});const t=totals();document.getElementById('menuBody').innerHTML=state.items.map((i,n)=>`<tr><td><input data-field="name" data-row="${n}" value="${esc(i.name)}"></td><td><input type="number" data-field="qty" data-row="${n}" value="${i.qty}"></td><td><input type="number" data-field="cost" data-row="${n}" value="${i.cost}"></td><td><input type="number" data-field="discountValue" data-row="${n}" value="${i.discountValue}"></td><td><select data-field="discountType" data-row="${n}"><option value="percent" ${i.discountType==='percent'?'selected':''}>%</option><option value="amount" ${i.discountType==='amount'?'selected':''}>Fixed</option></select></td><td class="readonly ${t.rows[n].discount?'neg':''}">${t.rows[n].discount?'-'+money(t.rows[n].discount):'—'}</td><td class="readonly">${money(t.rows[n].sc)}</td><td class="readonly">${money(t.rows[n].total)}</td>${state.people.map((_,p)=>`<td class="center"><input type="checkbox" data-check="${n}" data-person-index="${p}" ${i.consumed[p]?'checked':''}></td>`).join('')}<td class="readonly">${money(t.rows[n].per)}</td><td><button class="tiny" data-remove-row="${n}">✕</button></td></tr>`).join('');document.getElementById('menuFoot').innerHTML=`<tr><td colspan="2"><b>Total</b></td><td>${money(t.base)}</td><td></td><td></td><td class="neg">${t.discount?'-'+money(t.discount):money(0)}</td><td>${money(t.sc)}</td><td>${money(t.grand)}</td>${t.shares.map(x=>`<td class="center">${money(x)}</td>`).join('')}<td></td><td></td></tr>`;document.getElementById('summary').innerHTML=state.people.map((p,n)=>`<div class="person"><b>${esc(p)}</b><strong>${money(t.shares[n])}</strong><span class="paid ${state.paidFlags[n]?'yes':''}" data-paid-flag="${n}">${state.paidFlags[n]?'✅ Paid':'◻ Not paid'}</span></div>`).join('');document.getElementById('grand').textContent=money(t.grand);document.getElementById('paidBody').innerHTML=state.people.map((p,n)=>{const b=r2((Number(state.paid[n])||0)-t.shares[n]);return`<tr><td><b>${esc(p)}</b></td><td><input type="number" data-paid="${n}" value="${Number(state.paid[n])||0}"></td><td>${money(t.shares[n])}</td><td class="${b>.01?'pos':b<-.01?'neg':''}">${Math.abs(b)<=.01?'settled':b>0?'▲ '+money(b)+' gets back':'▼ '+money(Math.abs(b))+' owes'}</td></tr>`}).join('');const tx=transactions(t.shares);document.getElementById('settlements').innerHTML=tx.length?tx.map(x=>`<div class="settle"><div class="settle-main"><b class="neg">${esc(x.from)}</b><span>➜</span><b class="pos">${esc(x.to)}</b><span class="amount">${money(x.amount)}</span></div><div class="bank"><label style="display:inline;color:#666">โอนเข้า</label><select data-bank="${x.toIdx}"><option value="">— เลือกช่องทาง —</option>${METHODS.map(m=>`<option ${state.banks[x.toIdx]===m?'selected':''}>${esc(m)}</option>`).join('')}</select><input data-account="${x.toIdx}" value="${esc(state.accounts[x.toIdx])}" placeholder="เลขบัญชี / พร้อมเพย์"><button class="copy" data-copy="${esc(state.accounts[x.toIdx])}">📋 Copy</button></div></div>`).join(''):'<div class="empty">✅ Everyone is settled</div>';bind()}
-function bind(){document.querySelectorAll('[data-field]').forEach(el=>el.addEventListener(el.tagName==='SELECT'?'change':'input',e=>{const i=state.items[+e.target.dataset.row],f=e.target.dataset.field;i[f]=f==='name'||f==='discountType'?e.target.value:Number(e.target.value)||0;save();if(f!=='name')render()}));document.querySelectorAll('[data-check]').forEach(el=>el.onchange=e=>{state.items[+e.target.dataset.check].consumed[+e.target.dataset.personIndex]=e.target.checked;save();render()});document.querySelectorAll('[data-remove-row]').forEach(el=>el.onclick=e=>{state.items.splice(+e.currentTarget.dataset.removeRow,1);save();render()});document.querySelectorAll('[data-person]').forEach(el=>el.oninput=e=>{state.people[+e.target.dataset.person]=e.target.value;save()});document.querySelectorAll('[data-remove-person]').forEach(el=>el.onclick=e=>{const n=+e.currentTarget.dataset.removePerson;state.people.splice(n,1);['paid','paidFlags','banks','accounts'].forEach(k=>state[k].splice(n,1));state.items.forEach(i=>i.consumed.splice(n,1));save();render()});document.querySelectorAll('[data-paid-flag]').forEach(el=>el.onclick=e=>{const n=+e.currentTarget.dataset.paidFlag;state.paidFlags[n]=!state.paidFlags[n];save();render()});document.querySelectorAll('[data-paid]').forEach(el=>el.oninput=e=>{state.paid[+e.target.dataset.paid]=Number(e.target.value)||0;save();render()});document.querySelectorAll('[data-bank]').forEach(el=>el.onchange=e=>{state.banks[+e.target.dataset.bank]=e.target.value;save();render()});document.querySelectorAll('[data-account]').forEach(el=>el.oninput=e=>{state.accounts[+e.target.dataset.account]=e.target.value;save()});document.querySelectorAll('[data-copy]').forEach(el=>el.onclick=async e=>{const v=e.currentTarget.dataset.copy;if(!v)return;try{await navigator.clipboard.writeText(v);e.currentTarget.textContent='✅ Copied';setTimeout(()=>e.currentTarget.textContent='📋 Copy',1000)}catch(_){}})}
-function snapshot(){const old=state;const clone=document.documentElement.cloneNode(true);clone.querySelectorAll('script').forEach(x=>x.remove());clone.querySelectorAll('button,input,select').forEach(el=>{if(el.matches('input[type=checkbox]'))el.replaceWith(document.createTextNode(el.checked?'✅':'—'));else if(el.tagName==='BUTTON')el.remove();else el.replaceWith(document.createTextNode(el.value||'—'))});clone.querySelector('.top .actions')?.remove();const banner=clone.ownerDocument.createElement('div');banner.className='view-banner';banner.textContent='🔒 View-only snapshot';clone.querySelector('.wrap').prepend(banner);return '<!doctype html>\n'+clone.outerHTML}
-document.getElementById('service').oninput=e=>{state.service=Number(e.target.value)||0;save();render()};document.getElementById('vat').oninput=e=>{state.vat=Number(e.target.value)||0;save();render()};document.getElementById('currency').oninput=e=>{state.currency=e.target.value;save();render()};document.getElementById('addItem').onclick=()=>{state.items.push({name:'New item',qty:1,cost:0,discountValue:0,discountType:'percent',consumed:state.people.map(()=>false)});save();render()};document.getElementById('addPerson').onclick=()=>{state.people.push('Person '+(state.people.length+1));state.paid.push(0);state.paidFlags.push(false);state.banks.push('');state.accounts.push('');state.items.forEach(i=>i.consumed.push(false));save();render()};document.getElementById('resetBtn').onclick=()=>{if(confirm('Reset to sample data?')){state=sample();save();render()}};document.getElementById('clearBtn').onclick=()=>{if(confirm('Clear all data?')){state={service:state.service,vat:state.vat,currency:state.currency,people:[],items:[],paid:[],paidFlags:[],banks:[],accounts:[]};save();render()}};document.getElementById('shareBtn').onclick=()=>{const b=new Blob([snapshot()],{type:'text/html'}),a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='Split Bill (View Only).html';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)};
+const STORAGE_KEY = "splitBillDashboardState_v5";
+const LANG_KEY = "splitEaseLang";
+let lang = localStorage.getItem(LANG_KEY) || "en";
+const I18N = {
+  en: {
+    subtitle: "Add items, add people, tick who shared what \u2014 totals update automatically.",
+    tripDetailsHeader: "\uD83D\uDCDD Trip Details",
+    restaurantNameLabel: "Restaurant Name",
+    restaurantNamePlaceholder: "e.g. Regency Restaurant",
+    diningDateLabel: "Date",
+    shareBtn: "\uD83D\uDD17 Share (View Only)",
+    viewOnlyBanner: "\uD83D\uDD12 View-only copy \u2014 ask the owner to update the live dashboard if any numbers change.",
+    copySummaryBtn: "\uD83D\uDCCB Copy Summary",
+    copiedSummaryToast: "Copied! Paste into LINE or any chat app.",
+    summaryTitle: "SplitEase Summary",
+    summaryGrandTotal: "Grand Total",
+    summaryWhoOwes: "Who Owes What",
+    summarySettleUp: "Settle Up",
+    summaryBank: "Bank",
+    resetBtn: "\u21BA Reset to sample",
+    clearBtn: "\uD83D\uDDD1 Clear all",
+    langBtnLabel: "\uD83C\uDF10 EN",
+    chargesHeader: "\u2699\uFE0F Charges",
+    serviceCharge: "Service Charge",
+    vatLabel: "VAT",
+    currencySymbol: "Currency Symbol",
+    menuHeader: "\uD83C\uDF7D\uFE0F Menu & Split",
+    thMenu: "Menu",
+    thQty: "Qty",
+    thCostExcl: "Cost w/o SC & VAT",
+    thDiscValue: "Disc. Value",
+    thDiscType: "Disc. Type",
+    thDiscount: "Discount",
+    thCostSC: "Cost w/ SC",
+    thCostVAT: "Cost w/ VAT",
+    thCostHead: "Cost/Head",
+    addItem: "+ Add Item",
+    addPerson: "+ Add Person",
+    noteText: "* Discount can be set per item \u2014 leave it at 0 for items with no discount. Choose \"%\" to discount that item by a percentage, or \"Fixed\" to knock a flat amount off just that item. Discount is applied before Service Charge and VAT. Cost/Head splits that item's Cost w/ VAT evenly across everyone checked in that row.",
+    whoOwesHeader: "\uD83D\uDC65 Who Owes What",
+    grandTotalLabel: "Grand Total (all items, incl. discount + SC + VAT)",
+    whoPaidHeader: "\uD83D\uDCB5 Who Paid First",
+    thPerson: "Person",
+    thAmountPaid: "Amount Paid Upfront",
+    thTheirShare: "Their Share",
+    thBalance: "Balance",
+    paidNote: "Enter how much each person actually paid at the restaurant (e.g. whoever paid the bill by card). Balance = Amount Paid \u2212 Their Share: \u25B2 means they should get money back, \u25BC means they still owe.",
+    paidCheckOk: "\u2705 Paid Upfront total matches the Grand Total \u2014 the split is accurate.",
+    paidCheckShort: "\u26A0\uFE0F Paid Upfront total is",
+    paidCheckLess: "less than the Grand Total. Someone's Paid Upfront amount may be missing or entered incorrectly \u2014 the split may come up short.",
+    paidCheckOver: "more than the Grand Total. Check that no one's Paid Upfront amount was entered twice or too high.",
+    paidUpfrontTotalLabel: "Paid Upfront Total",
+    settleHeader: "\uD83D\uDD04 Settle Up \u2014 Who Transfers to Whom",
+    footerText: "SplitEase \u00B7 edits are saved automatically in this browser",
+    paidStatus: "\u2705 Paid",
+    notPaidStatus: "\u25FB\uFE0F Not paid",
+    getsBack: "gets back",
+    owesLabel: "owes",
+    settledLabel: "settled",
+    allSettled: "\u2705 Everyone is settled \u2014 no transfers needed.",
+    transferTo: "Transfer to",
+    selectPaymentPlaceholder: "\u2014 Select payment method \u2014",
+    promptpayGroupLabel: "PromptPay",
+    bankGroupLabel: "Banks",
+    accPlaceholderPromptpay: "Phone number or ID card no.",
+    accPlaceholderBank: "Account number",
+    copyBtn: "\uD83D\uDCCB Copy",
+    copiedBtn: "\u2705 Copied",
+    noNumberBtn: "\u26A0\uFE0F No number",
+    removeBtn: "remove",
+    newItemName: "New item",
+    newPersonPrefix: "Person",
+    resetConfirm: "Reset dashboard to the original sample data? This will discard current edits.",
+    clearConfirm: "Clear all items and people? This cannot be undone.",
+    printTitle: "SplitEase Summary",
+    generatedOn: "Generated",
+    totalAmountLabel: "Total Amount"
+  },
+  th: {
+    subtitle: "\u0E40\u0E1E\u0E34\u0E48\u0E21\u0E40\u0E21\u0E19\u0E39 \u0E40\u0E1E\u0E34\u0E48\u0E21\u0E04\u0E19 \u0E15\u0E34\u0E4A\u0E01\u0E27\u0E48\u0E32\u0E43\u0E04\u0E23\u0E01\u0E34\u0E19\u0E2D\u0E30\u0E44\u0E23 \u0E22\u0E2D\u0E14\u0E08\u0E30\u0E04\u0E33\u0E19\u0E27\u0E13\u0E43\u0E2B\u0E49\u0E2D\u0E31\u0E15\u0E42\u0E19\u0E21\u0E31\u0E15\u0E34",
+    tripDetailsHeader: "\uD83D\uDCDD \u0E23\u0E32\u0E22\u0E25\u0E30\u0E40\u0E2D\u0E35\u0E22\u0E14\u0E21\u0E37\u0E49\u0E2D\u0E19\u0E35\u0E49",
+    restaurantNameLabel: "\u0E0A\u0E37\u0E48\u0E2D\u0E23\u0E49\u0E32\u0E19",
+    restaurantNamePlaceholder: "\u0E40\u0E0A\u0E48\u0E19 \u0E23\u0E49\u0E32\u0E19\u0E15\u0E49\u0E19\u0E15\u0E33\u0E23\u0E31\u0E1A",
+    diningDateLabel: "\u0E27\u0E31\u0E19\u0E17\u0E35\u0E48",
+    shareBtn: "\uD83D\uDD17 \u0E41\u0E0A\u0E23\u0E4C (\u0E14\u0E39\u0E44\u0E14\u0E49\u0E2D\u0E22\u0E48\u0E32\u0E07\u0E40\u0E14\u0E35\u0E22\u0E27)",
+    viewOnlyBanner: "\uD83D\uDD12 \u0E44\u0E1F\u0E25\u0E4C\u0E19\u0E35\u0E49\u0E14\u0E39\u0E44\u0E14\u0E49\u0E2D\u0E22\u0E48\u0E32\u0E07\u0E40\u0E14\u0E35\u0E22\u0E27 \u0E41\u0E01\u0E49\u0E44\u0E02\u0E44\u0E21\u0E48\u0E44\u0E14\u0E49 \u0E2B\u0E32\u0E01\u0E15\u0E31\u0E27\u0E40\u0E25\u0E02\u0E40\u0E1B\u0E25\u0E35\u0E48\u0E22\u0E19\u0E23\u0E1A\u0E01\u0E27\u0E19\u0E40\u0E08\u0E49\u0E32\u0E02\u0E2D\u0E07\u0E43\u0E2B\u0E49\u0E2D\u0E31\u0E1B\u0E40\u0E14\u0E15\u0E44\u0E1F\u0E25\u0E4C\u0E43\u0E2B\u0E21\u0E48",
+    copySummaryBtn: "\uD83D\uDCCB \u0E04\u0E31\u0E14\u0E25\u0E2D\u0E01\u0E2A\u0E23\u0E38\u0E1B",
+    copiedSummaryToast: "\u0E04\u0E31\u0E14\u0E25\u0E2D\u0E01\u0E41\u0E25\u0E49\u0E27! \u0E19\u0E33\u0E44\u0E1B\u0E27\u0E32\u0E07\u0E43\u0E19 LINE \u0E2B\u0E23\u0E37\u0E2D\u0E41\u0E0A\u0E17\u0E44\u0E14\u0E49\u0E40\u0E25\u0E22",
+    summaryTitle: "\u0E2A\u0E23\u0E38\u0E1B\u0E1A\u0E34\u0E25 SplitEase",
+    summaryGrandTotal: "\u0E22\u0E2D\u0E14\u0E23\u0E27\u0E21\u0E17\u0E31\u0E49\u0E07\u0E2B\u0E21\u0E14",
+    summaryWhoOwes: "\u0E2A\u0E23\u0E38\u0E1B\u0E22\u0E2D\u0E14\u0E17\u0E35\u0E48\u0E15\u0E49\u0E2D\u0E07\u0E08\u0E48\u0E32\u0E22",
+    summarySettleUp: "\u0E40\u0E04\u0E25\u0E35\u0E22\u0E23\u0E4C\u0E40\u0E07\u0E34\u0E19",
+    summaryBank: "\u0E1A\u0E31\u0E0D\u0E0A\u0E35",
+    resetBtn: "\u21BA \u0E23\u0E35\u0E40\u0E0B\u0E47\u0E15\u0E40\u0E1B\u0E47\u0E19\u0E15\u0E31\u0E27\u0E2D\u0E22\u0E48\u0E32\u0E07",
+    clearBtn: "\uD83D\uDDD1 \u0E25\u0E49\u0E32\u0E07\u0E17\u0E31\u0E49\u0E07\u0E2B\u0E21\u0E14",
+    langBtnLabel: "\uD83C\uDF10 \u0E44\u0E17\u0E22",
+    chargesHeader: "\u2699\uFE0F \u0E04\u0E48\u0E32\u0E1A\u0E23\u0E34\u0E01\u0E32\u0E23",
+    serviceCharge: "\u0E04\u0E48\u0E32\u0E1A\u0E23\u0E34\u0E01\u0E32\u0E23 (Service Charge)",
+    vatLabel: "\u0E20\u0E32\u0E29\u0E35\u0E21\u0E39\u0E25\u0E04\u0E48\u0E32\u0E40\u0E1E\u0E34\u0E48\u0E21 (VAT)",
+    currencySymbol: "\u0E2A\u0E31\u0E0D\u0E25\u0E31\u0E01\u0E29\u0E13\u0E4C\u0E2A\u0E01\u0E38\u0E25\u0E40\u0E07\u0E34\u0E19",
+    menuHeader: "\uD83C\uDF7D\uFE0F \u0E40\u0E21\u0E19\u0E39 & \u0E41\u0E1A\u0E48\u0E07\u0E08\u0E48\u0E32\u0E22",
+    thMenu: "\u0E40\u0E21\u0E19\u0E39",
+    thQty: "\u0E08\u0E33\u0E19\u0E27\u0E19",
+    thCostExcl: "\u0E23\u0E32\u0E04\u0E32\u0E01\u0E48\u0E2D\u0E19 SC & VAT",
+    thDiscValue: "\u0E2A\u0E48\u0E27\u0E19\u0E25\u0E14",
+    thDiscType: "\u0E1B\u0E23\u0E30\u0E40\u0E20\u0E17\u0E2A\u0E48\u0E27\u0E19\u0E25\u0E14",
+    thDiscount: "\u0E2A\u0E48\u0E27\u0E19\u0E25\u0E14\u0E17\u0E35\u0E48\u0E2B\u0E31\u0E01",
+    thCostSC: "\u0E23\u0E32\u0E04\u0E32 + SC",
+    thCostVAT: "\u0E23\u0E32\u0E04\u0E32 + VAT",
+    thCostHead: "\u0E23\u0E32\u0E04\u0E32/\u0E2B\u0E31\u0E27",
+    addItem: "+ \u0E40\u0E1E\u0E34\u0E48\u0E21\u0E40\u0E21\u0E19\u0E39",
+    addPerson: "+ \u0E40\u0E1E\u0E34\u0E48\u0E21\u0E04\u0E19",
+    noteText: "* \u0E15\u0E31\u0E49\u0E07\u0E2A\u0E48\u0E27\u0E19\u0E25\u0E14\u0E41\u0E22\u0E01\u0E15\u0E32\u0E21\u0E40\u0E21\u0E19\u0E39\u0E44\u0E14\u0E49 \u2014 \u0E1B\u0E25\u0E48\u0E2D\u0E22\u0E44\u0E27\u0E49 0 \u0E16\u0E49\u0E32\u0E40\u0E21\u0E19\u0E39\u0E19\u0E31\u0E49\u0E19\u0E44\u0E21\u0E48\u0E21\u0E35\u0E2A\u0E48\u0E27\u0E19\u0E25\u0E14 \u0E40\u0E25\u0E37\u0E2D\u0E01 \"%\" \u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E2B\u0E31\u0E01\u0E40\u0E1B\u0E47\u0E19\u0E40\u0E1B\u0E2D\u0E23\u0E4C\u0E40\u0E0B\u0E47\u0E19\u0E15\u0E4C \u0E2B\u0E23\u0E37\u0E2D \"\u0E04\u0E07\u0E17\u0E35\u0E48\" \u0E40\u0E1E\u0E37\u0E48\u0E2D\u0E2B\u0E31\u0E01\u0E40\u0E1B\u0E47\u0E19\u0E08\u0E33\u0E19\u0E27\u0E19\u0E40\u0E07\u0E34\u0E19\u0E15\u0E32\u0E22\u0E15\u0E31\u0E27\u0E40\u0E09\u0E1E\u0E32\u0E30\u0E40\u0E21\u0E19\u0E39\u0E19\u0E31\u0E49\u0E19 \u0E2A\u0E48\u0E27\u0E19\u0E25\u0E14\u0E08\u0E30\u0E16\u0E39\u0E01\u0E2B\u0E31\u0E01\u0E01\u0E48\u0E2D\u0E19\u0E04\u0E34\u0E14 Service Charge \u0E41\u0E25\u0E30 VAT \u0E23\u0E32\u0E04\u0E32/\u0E2B\u0E31\u0E27 \u0E08\u0E30\u0E2B\u0E32\u0E23\u0E23\u0E32\u0E04\u0E32 (\u0E23\u0E27\u0E21 VAT) \u0E02\u0E2D\u0E07\u0E40\u0E21\u0E19\u0E39\u0E19\u0E31\u0E49\u0E19\u0E40\u0E17\u0E48\u0E32\u0E46 \u0E01\u0E31\u0E19\u0E15\u0E32\u0E21\u0E08\u0E33\u0E19\u0E27\u0E19\u0E04\u0E19\u0E17\u0E35\u0E48\u0E15\u0E34\u0E4A\u0E01\u0E43\u0E19\u0E41\u0E16\u0E27\u0E19\u0E31\u0E49\u0E19",
+    whoOwesHeader: "\uD83D\uDC65 \u0E2A\u0E23\u0E38\u0E1B\u0E22\u0E2D\u0E14\u0E17\u0E35\u0E48\u0E15\u0E49\u0E2D\u0E07\u0E08\u0E48\u0E32\u0E22",
+    grandTotalLabel: "\u0E22\u0E2D\u0E14\u0E23\u0E27\u0E21\u0E17\u0E31\u0E49\u0E07\u0E2B\u0E21\u0E14 (\u0E23\u0E27\u0E21\u0E2A\u0E48\u0E27\u0E19\u0E25\u0E14 + SC + VAT)",
+    whoPaidHeader: "\uD83D\uDCB5 \u0E43\u0E04\u0E23\u0E2A\u0E33\u0E23\u0E2D\u0E07\u0E08\u0E48\u0E32\u0E22\u0E44\u0E1B\u0E01\u0E48\u0E2D\u0E19",
+    thPerson: "\u0E0A\u0E37\u0E48\u0E2D",
+    thAmountPaid: "\u0E08\u0E33\u0E19\u0E27\u0E19\u0E17\u0E35\u0E48\u0E08\u0E48\u0E32\u0E22\u0E44\u0E1B\u0E01\u0E48\u0E2D\u0E19",
+    thTheirShare: "\u0E2A\u0E48\u0E27\u0E19\u0E17\u0E35\u0E48\u0E15\u0E49\u0E2D\u0E07\u0E08\u0E48\u0E32\u0E22",
+    thBalance: "\u0E22\u0E2D\u0E14\u0E04\u0E07\u0E40\u0E2B\u0E25\u0E37\u0E2D",
+    paidNote: "\u0E01\u0E23\u0E2D\u0E01\u0E08\u0E33\u0E19\u0E27\u0E19\u0E40\u0E07\u0E34\u0E19\u0E17\u0E35\u0E48\u0E41\u0E15\u0E48\u0E25\u0E30\u0E04\u0E19\u0E08\u0E48\u0E32\u0E22\u0E44\u0E1B\u0E08\u0E23\u0E34\u0E07\u0E17\u0E35\u0E48\u0E23\u0E49\u0E32\u0E19 (\u0E40\u0E0A\u0E48\u0E19 \u0E04\u0E19\u0E17\u0E35\u0E48\u0E23\u0E39\u0E14\u0E1A\u0E31\u0E15\u0E23\u0E08\u0E48\u0E32\u0E22\u0E1A\u0E34\u0E25) \u0E22\u0E2D\u0E14\u0E04\u0E07\u0E40\u0E2B\u0E25\u0E37\u0E2D = \u0E08\u0E33\u0E19\u0E27\u0E19\u0E17\u0E35\u0E48\u0E08\u0E48\u0E32\u0E22 \u2212 \u0E2A\u0E48\u0E27\u0E19\u0E17\u0E35\u0E48\u0E15\u0E49\u0E2D\u0E07\u0E08\u0E48\u0E32\u0E22: \u25B2 \u0E2B\u0E21\u0E32\u0E22\u0E16\u0E36\u0E07\u0E08\u0E30\u0E44\u0E14\u0E49\u0E40\u0E07\u0E34\u0E19\u0E04\u0E37\u0E19 \u25BC \u0E2B\u0E21\u0E32\u0E22\u0E16\u0E36\u0E07\u0E22\u0E31\u0E07\u0E15\u0E34\u0E14\u0E40\u0E07\u0E34\u0E19\u0E2D\u0E22\u0E39\u0E48",
+    settleHeader: "\uD83D\uDD04 \u0E40\u0E04\u0E25\u0E35\u0E22\u0E23\u0E4C\u0E40\u0E07\u0E34\u0E19 \u2014 \u0E43\u0E04\u0E23\u0E42\u0E2D\u0E19\u0E43\u0E2B\u0E49\u0E43\u0E04\u0E23",
+    footerText: "SplitEase \u00B7 \u0E01\u0E32\u0E23\u0E41\u0E01\u0E49\u0E44\u0E02\u0E08\u0E30\u0E16\u0E39\u0E01\u0E1A\u0E31\u0E19\u0E17\u0E36\u0E01\u0E2D\u0E31\u0E15\u0E42\u0E19\u0E21\u0E31\u0E15\u0E34\u0E43\u0E19\u0E40\u0E1A\u0E23\u0E32\u0E27\u0E4C\u0E40\u0E0B\u0E2D\u0E23\u0E4C\u0E19\u0E35\u0E49",
+    paidStatus: "\u2705 \u0E08\u0E48\u0E32\u0E22\u0E41\u0E25\u0E49\u0E27",
+    notPaidStatus: "\u25FB\uFE0F \u0E22\u0E31\u0E07\u0E44\u0E21\u0E48\u0E08\u0E48\u0E32\u0E22",
+    getsBack: "\u0E44\u0E14\u0E49\u0E40\u0E07\u0E34\u0E19\u0E04\u0E37\u0E19",
+    owesLabel: "\u0E15\u0E34\u0E14\u0E40\u0E07\u0E34\u0E19",
+    settledLabel: "\u0E40\u0E23\u0E35\u0E22\u0E1A\u0E23\u0E49\u0E2D\u0E22\u0E41\u0E25\u0E49\u0E27",
+    paidCheckOk: "\u2705 \u0E22\u0E2D\u0E14\u0E23\u0E27\u0E21 Paid Upfront \u0E15\u0E23\u0E07\u0E01\u0E31\u0E1A\u0E22\u0E2D\u0E14\u0E23\u0E27\u0E21\u0E17\u0E31\u0E49\u0E07\u0E2B\u0E21\u0E14\u0E41\u0E25\u0E49\u0E27 \u2014 \u0E01\u0E32\u0E23\u0E2B\u0E32\u0E23\u0E16\u0E39\u0E01\u0E15\u0E49\u0E2D\u0E07",
+    paidCheckShort: "\u26A0\uFE0F \u0E22\u0E2D\u0E14\u0E23\u0E27\u0E21 Paid Upfront",
+    paidCheckLess: "\u0E19\u0E49\u0E2D\u0E22\u0E01\u0E27\u0E48\u0E32\u0E22\u0E2D\u0E14\u0E23\u0E27\u0E21\u0E17\u0E31\u0E49\u0E07\u0E2B\u0E21\u0E14 \u0E2D\u0E32\u0E08\u0E21\u0E35\u0E1A\u0E32\u0E07\u0E04\u0E19\u0E43\u0E2A\u0E48\u0E22\u0E2D\u0E14\u0E40\u0E07\u0E34\u0E19\u0E1C\u0E34\u0E14\u0E2B\u0E23\u0E37\u0E2D\u0E22\u0E31\u0E07\u0E44\u0E21\u0E48\u0E44\u0E14\u0E49\u0E43\u0E2A\u0E48 \u0E2D\u0E32\u0E08\u0E17\u0E33\u0E43\u0E2B\u0E49\u0E2B\u0E32\u0E23\u0E40\u0E07\u0E34\u0E19\u0E44\u0E14\u0E49\u0E44\u0E21\u0E48\u0E04\u0E23\u0E1A",
+    paidCheckOver: "\u0E21\u0E32\u0E01\u0E01\u0E27\u0E48\u0E32\u0E22\u0E2D\u0E14\u0E23\u0E27\u0E21\u0E17\u0E31\u0E49\u0E07\u0E2B\u0E21\u0E14 \u0E25\u0E2D\u0E07\u0E40\u0E0A\u0E47\u0E04\u0E27\u0E48\u0E32\u0E21\u0E35\u0E43\u0E04\u0E23\u0E43\u0E2A\u0E48\u0E22\u0E2D\u0E14\u0E0B\u0E49\u0E33\u0E2B\u0E23\u0E37\u0E2D\u0E43\u0E2A\u0E48\u0E2A\u0E39\u0E07\u0E40\u0E01\u0E34\u0E19\u0E44\u0E1B\u0E2B\u0E23\u0E37\u0E2D\u0E44\u0E21\u0E48",
+    paidUpfrontTotalLabel: "\u0E22\u0E2D\u0E14\u0E23\u0E27\u0E21 Paid Upfront",
+    allSettled: "\u2705 \u0E17\u0E38\u0E01\u0E04\u0E19\u0E40\u0E04\u0E25\u0E35\u0E22\u0E23\u0E4C\u0E40\u0E07\u0E34\u0E19\u0E04\u0E23\u0E1A\u0E41\u0E25\u0E49\u0E27 \u0E44\u0E21\u0E48\u0E15\u0E49\u0E2D\u0E07\u0E42\u0E2D\u0E19\u0E40\u0E1E\u0E34\u0E48\u0E21",
+    transferTo: "\u0E42\u0E2D\u0E19\u0E40\u0E02\u0E49\u0E32\u0E1A\u0E31\u0E0D\u0E0A\u0E35",
+    selectPaymentPlaceholder: "\u2014 \u0E40\u0E25\u0E37\u0E2D\u0E01\u0E0A\u0E48\u0E2D\u0E07\u0E17\u0E32\u0E07\u0E23\u0E31\u0E1A\u0E42\u0E2D\u0E19 \u2014",
+    promptpayGroupLabel: "\u0E1E\u0E23\u0E49\u0E2D\u0E21\u0E40\u0E1E\u0E22\u0E4C",
+    bankGroupLabel: "\u0E18\u0E19\u0E32\u0E04\u0E32\u0E23",
+    accPlaceholderPromptpay: "\u0E40\u0E1A\u0E2D\u0E23\u0E4C\u0E42\u0E17\u0E23\u0E28\u0E31\u0E1E\u0E17\u0E4C \u0E2B\u0E23\u0E37\u0E2D \u0E40\u0E25\u0E02\u0E1A\u0E31\u0E15\u0E23 \u0E1B\u0E0A\u0E0A.",
+    accPlaceholderBank: "\u0E40\u0E25\u0E02\u0E17\u0E35\u0E48\u0E1A\u0E31\u0E0D\u0E0A\u0E35",
+    copyBtn: "\uD83D\uDCCB \u0E04\u0E31\u0E14\u0E25\u0E2D\u0E01",
+    copiedBtn: "\u2705 \u0E04\u0E31\u0E14\u0E25\u0E2D\u0E01\u0E41\u0E25\u0E49\u0E27",
+    noNumberBtn: "\u26A0\uFE0F \u0E44\u0E21\u0E48\u0E21\u0E35\u0E40\u0E25\u0E02",
+    removeBtn: "\u0E25\u0E1A",
+    newItemName: "\u0E40\u0E21\u0E19\u0E39\u0E43\u0E2B\u0E21\u0E48",
+    newPersonPrefix: "\u0E04\u0E19\u0E17\u0E35\u0E48",
+    resetConfirm: "\u0E23\u0E35\u0E40\u0E0B\u0E47\u0E15\u0E01\u0E25\u0E31\u0E1A\u0E40\u0E1B\u0E47\u0E19\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25\u0E15\u0E31\u0E27\u0E2D\u0E22\u0E48\u0E32\u0E07\u0E40\u0E23\u0E34\u0E48\u0E21\u0E15\u0E49\u0E19? \u0E01\u0E32\u0E23\u0E41\u0E01\u0E49\u0E44\u0E02\u0E1B\u0E31\u0E08\u0E08\u0E38\u0E1A\u0E31\u0E19\u0E17\u0E31\u0E49\u0E07\u0E2B\u0E21\u0E14\u0E08\u0E30\u0E2B\u0E32\u0E22\u0E44\u0E1B",
+    clearConfirm: "\u0E25\u0E49\u0E32\u0E07\u0E40\u0E21\u0E19\u0E39\u0E41\u0E25\u0E30\u0E23\u0E32\u0E22\u0E0A\u0E37\u0E48\u0E2D\u0E17\u0E31\u0E49\u0E07\u0E2B\u0E21\u0E14? \u0E01\u0E32\u0E23\u0E01\u0E23\u0E30\u0E17\u0E33\u0E19\u0E35\u0E49\u0E44\u0E21\u0E48\u0E2A\u0E32\u0E21\u0E32\u0E23\u0E16\u0E22\u0E49\u0E2D\u0E19\u0E01\u0E25\u0E31\u0E1A\u0E44\u0E14\u0E49",
+    printTitle: "\u0E2A\u0E23\u0E38\u0E1B\u0E1A\u0E34\u0E25 SplitEase",
+    generatedOn: "\u0E2A\u0E23\u0E49\u0E32\u0E07\u0E40\u0E21\u0E37\u0E48\u0E2D",
+    totalAmountLabel: "\u0E22\u0E2D\u0E14\u0E23\u0E27\u0E21"
+  }
+};
+function t(key){ return (I18N[lang] && I18N[lang][key]) || I18N.en[key] || key; }
+const PAYMENT_METHODS = [
+  "พร้อมเพย์ (PromptPay)"
+];
+const THAI_BANKS = [
+  "ธนาคารกรุงเทพ (Bangkok Bank)",
+  "ธนาคารกสิกรไทย (Kasikornbank)",
+  "ธนาคารกรุงไทย (Krungthai Bank)",
+  "ธนาคารทหารไทยธนชาต (ttb)",
+  "ธนาคารไทยพาณิชย์ (SCB)",
+  "ธนาคารกรุงศรีอยุธยา (Krungsri)",
+  "ธนาคารเกียรตินาคินภัทร (KKP)",
+  "ธนาคารซีไอเอ็มบี ไทย (CIMB Thai)",
+  "ธนาคารทิสโก้ (TISCO)",
+  "ธนาคารยูโอบี (UOB)",
+  "ธนาคารไทยเครดิต (Thai Credit Bank)",
+  "ธนาคารแลนด์ แอนด์ เฮ้าส์ (LH Bank)",
+  "ธนาคารไอซีบีซี (ไทย) (ICBC Thai)",
+  "ธนาคารออมสิน (GSB)",
+  "ธนาคารอาคารสงเคราะห์ (GH Bank)",
+  "ธนาคารเพื่อการเกษตรและสหกรณ์การเกษตร (BAAC)",
+  "ธนาคารเพื่อการส่งออกและนำเข้าแห่งประเทศไทย (EXIM Bank)",
+  "ธนาคารพัฒนาวิสาหกิจขนาดกลางและขนาดย่อมแห่งประเทศไทย (SME Bank)",
+  "ธนาคารอิสลามแห่งประเทศไทย (iBank)",
+  "ธนาคารซิตี้แบงก์ (Citibank)",
+  "ธนาคารสแตนดาร์ดชาร์เตอร์ด (Standard Chartered)",
+  "ธนาคารคลิกซ์ (CLICX Bank)"
+];
+function round2(n){ return Math.round((Number(n)||0) * 100) / 100; }
+function todayISO(){
+  const d = new Date();
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const dd = String(d.getDate()).padStart(2,"0");
+  return d.getFullYear() + "-" + mm + "-" + dd;
+}
+function buildSample(){
+  const scPercent = 10, vatPercent = 7, currencySymbol = "฿";
+  const items = [
+    { name: "Regency",      qty: 1, cost: 1350, consumed: [true, true, true], discountType: "percent", discountValue: 0 },
+    { name: "Soda",         qty: 3, cost: 180,  consumed: [true, true, true], discountType: "percent", discountValue: 0 },
+    { name: "Water",        qty: 3, cost: 180,  consumed: [true, true, true], discountType: "percent", discountValue: 0 },
+    { name: "Ice",          qty: 1, cost: 100,  consumed: [true, true, true], discountType: "percent", discountValue: 0 },
+    { name: "Coke",         qty: 1, cost: 60,   consumed: [true, true, true], discountType: "percent", discountValue: 0 },
+    { name: "ยำวุ้นเส้น",    qty: 1, cost: 220,  consumed: [true, false, false], discountType: "percent", discountValue: 0 }
+  ];
+  const members = ["Bom", "Tae", "Whaa"];
+  const totalVAT = items.reduce((s, item) => {
+    const costSC = item.cost * (1 + scPercent / 100);
+    const costVAT = costSC * (1 + vatPercent / 100);
+    return s + costVAT;
+  }, 0);
+  return {
+    scPercent, vatPercent, currencySymbol, members, items,
+    restaurantName: "Regency Restaurant",
+    diningDate: todayISO(),
+    paid: members.map(() => false),
+    paidAmounts: members.map((m, i) => i === 0 ? round2(totalVAT) : 0),
+    bankNames: members.map((m, i) => i === 0 ? THAI_BANKS[1] : ""),
+    bankAccounts: members.map((m, i) => i === 0 ? "123-4-56789-0" : "")
+  };
+}
+let state = loadState() || buildSample();
+normalizeState();
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+    if(!parsed.members || !parsed.items) return null;
+    return parsed;
+  }catch(e){ return null; }
+}
+function saveState(){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+function normalizeState(){
+  if(typeof state.restaurantName !== "string") state.restaurantName = "";
+  if(typeof state.diningDate !== "string" || !state.diningDate) state.diningDate = todayISO();
+  if(!Array.isArray(state.paid)) state.paid = state.members.map(() => false);
+  if(!Array.isArray(state.paidAmounts)) state.paidAmounts = state.members.map(() => 0);
+  if(!Array.isArray(state.bankNames)) state.bankNames = state.members.map(() => "");
+  if(!Array.isArray(state.bankAccounts)) state.bankAccounts = state.members.map(() => "");
+  while(state.paid.length < state.members.length) state.paid.push(false);
+  while(state.paidAmounts.length < state.members.length) state.paidAmounts.push(0);
+  while(state.bankNames.length < state.members.length) state.bankNames.push("");
+  while(state.bankAccounts.length < state.members.length) state.bankAccounts.push("");
+  state.items.forEach(item => {
+    if(!Array.isArray(item.consumed)) item.consumed = state.members.map(() => false);
+    while(item.consumed.length < state.members.length) item.consumed.push(false);
+    if(item.discountType !== "percent" && item.discountType !== "amount") item.discountType = "percent";
+    if(typeof item.discountValue !== "number" || isNaN(item.discountValue)) item.discountValue = 0;
+  });
+}
+function fmt(n){
+  if(isNaN(n)) n = 0;
+  return state.currencySymbol + Number(n).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function getItemDiscount(item){
+  const dVal = Number(item.discountValue||0);
+  if(dVal <= 0) return 0;
+  const cost = Number(item.cost||0);
+  if(item.discountType === "amount"){
+    return Math.min(cost, dVal);
+  }
+  return Math.min(cost, cost * (dVal/100));
+}
+function calcRow(item){
+  const discount = getItemDiscount(item);
+  const netCost = Math.max(0, Number(item.cost||0) - discount);
+  const costSC = netCost * (1 + Number(state.scPercent||0)/100);
+  const costVAT = costSC * (1 + Number(state.vatPercent||0)/100);
+  const consumedCount = item.consumed.filter(Boolean).length;
+  const perHead = consumedCount > 0 ? costVAT / consumedCount : 0;
+  return { discount, netCost, costSC, costVAT, perHead };
+}
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function escapeAttr(s){ return escapeHtml(s); }
+function captureFocus(){
+  const active = document.activeElement;
+  if(!active || (active.tagName !== "INPUT" && active.tagName !== "SELECT")) return null;
+  let selector = null;
+  const idxClasses = ["member-name-input","paid-amount","bank-select","acc-number-input"];
+  if(active.id){
+    selector = "#" + active.id;
+  } else if(active.dataset.idx !== undefined){
+    const cls = idxClasses.find(c => active.classList.contains(c));
+    if(cls) selector = `.${cls}[data-idx="${active.dataset.idx}"]`;
+  } else if(active.dataset.row !== undefined){
+    const cls = [...active.classList].find(c => ["item-name","item-qty","item-cost","item-disc-value","item-disc-type"].includes(c));
+    if(cls) selector = `.${cls}[data-row="${active.dataset.row}"]`;
+  }
+  if(!selector) return null;
+  return { selector, start: active.selectionStart, end: active.selectionEnd };
+}
+function restoreFocus(info){
+  if(!info) return;
+  const el = document.querySelector(info.selector);
+  if(!el) return;
+  el.focus();
+  if(typeof info.start === "number" && el.setSelectionRange){
+    try{ el.setSelectionRange(info.start, info.end); }catch(e){}
+  }
+}
+function render(){
+  const focusInfo = captureFocus();
+  const headerRow = document.getElementById("headerRow");
+  headerRow.querySelectorAll(".member-col").forEach(el => el.remove());
+  const costHeadTh = headerRow.children[8];
+  state.members.forEach((m, idx) => {
+    const th = document.createElement("th");
+    th.className = "member-col";
+    th.innerHTML = `
+      <input type="text" class="member-name-input" data-idx="${idx}" value="${escapeAttr(m)}">
+      <button class="remove-member-btn" data-idx="${idx}">${t("removeBtn")}</button>
+    `;
+    headerRow.insertBefore(th, costHeadTh);
+  });
+  const body = document.getElementById("itemsBody");
+  body.innerHTML = "";
+  state.items.forEach((item, rIdx) => {
+    const tr = document.createElement("tr");
+    let membersHtml = "";
+    state.members.forEach((m, cIdx) => {
+      membersHtml += `<td class="member-col">
+        <input type="checkbox" data-row="${rIdx}" data-col="${cIdx}" class="consume-check" ${item.consumed[cIdx] ? "checked" : ""}>
+      </td>`;
+    });
+    tr.innerHTML = `
+      <td><input type="text" class="item-name" data-row="${rIdx}" value="${escapeAttr(item.name)}"></td>
+      <td><input type="number" class="item-qty" data-row="${rIdx}" value="${item.qty}" min="0" step="1"></td>
+      <td><input type="number" class="item-cost" data-row="${rIdx}" value="${item.cost}" min="0" step="0.01"></td>
+      <td><input type="number" class="item-disc-value" data-row="${rIdx}" value="${item.discountValue||0}" min="0" step="0.01" placeholder="0"></td>
+      <td>
+        <select class="item-disc-type" data-row="${rIdx}">
+          <option value="percent" ${item.discountType !== "amount" ? "selected" : ""}>%</option>
+          <option value="amount" ${item.discountType === "amount" ? "selected" : ""}>฿</option>
+        </select>
+      </td>
+      <td><span class="readonly-val discount-val" data-row="${rIdx}"></span></td>
+      <td><span class="readonly-val cost-sc-val" data-row="${rIdx}"></span></td>
+      <td><span class="readonly-val cost-vat-val" data-row="${rIdx}"></span></td>
+      ${membersHtml}
+      <td><span class="readonly-val cost-head-val" data-row="${rIdx}"></span></td>
+      <td><button class="icon-btn remove-item-btn" data-row="${rIdx}" title="${t('removeBtn')}">✕</button></td>
+    `;
+    body.appendChild(tr);
+  });
+  const foot = document.getElementById("tableFoot");
+  let memberFootHtml = "";
+  state.members.forEach((m, cIdx) => {
+    memberFootHtml += `<td class="member-col member-total-val" data-idx="${cIdx}"></td>`;
+  });
+  foot.innerHTML = `
+    <tr>
+      <td colspan="2">${t("totalAmountLabel")}</td>
+      <td class="total-base-val"></td>
+      <td></td>
+      <td></td>
+      <td class="total-discount-val"></td>
+      <td class="total-sc-val"></td>
+      <td class="total-vat-val"></td>
+      ${memberFootHtml}
+      <td></td>
+      <td></td>
+    </tr>
+  `;
+  const grid = document.getElementById("summaryGrid");
+  grid.innerHTML = "";
+  state.members.forEach((m, idx) => {
+    const paid = !!state.paid[idx];
+    const card = document.createElement("div");
+    card.className = "summary-card";
+    card.dataset.idx = idx;
+    card.innerHTML = `
+      <div class="name">${escapeHtml(m)}</div>
+      <div class="amount"></div>
+      <div class="status ${paid ? "paid" : "unpaid"}" data-idx="${idx}">${paid ? t("paidStatus") : t("notPaidStatus")}</div>
+    `;
+    grid.appendChild(card);
+  });
+  const paidBody = document.getElementById("paidBody");
+  paidBody.innerHTML = "";
+  state.members.forEach((m, idx) => {
+    const tr = document.createElement("tr");
+    const paidVal = state.paidAmounts[idx] ?? 0;
+    tr.innerHTML = `
+      <td><strong>${escapeHtml(m)}</strong></td>
+      <td><input type="number" class="paid-amount" data-idx="${idx}" value="${paidVal}" min="0" step="0.01"></td>
+      <td><span class="readonly-val paid-share-val" data-idx="${idx}"></span></td>
+      <td><span class="balance-val" data-idx="${idx}"></span></td>
+    `;
+    paidBody.appendChild(tr);
+  });
+  attachRowListeners();
+  patchCalculations();
+  restoreFocus(focusInfo);
+}
+function patchCalculations(){
+  const focusInfo = captureFocus();
+  syncSettingsInputs();
+  let totalBase = 0, totalDiscount = 0, totalSC = 0, totalVAT = 0;
+  state.items.forEach((item, rIdx) => {
+    const { discount, costSC, costVAT, perHead } = calcRow(item);
+    totalBase += Number(item.cost||0);
+    totalDiscount += discount;
+    totalSC += costSC;
+    totalVAT += costVAT;
+    const discEl = document.querySelector(`.discount-val[data-row="${rIdx}"]`);
+    if(discEl){
+      discEl.textContent = discount > 0.004 ? "-" + fmt(discount) : "—";
+      discEl.classList.toggle("has-discount", discount > 0.004);
+    }
+    const discInputEl = document.querySelector(`.item-disc-value[data-row="${rIdx}"]`);
+    if(discInputEl){
+      discInputEl.classList.toggle("has-discount", discount > 0.004);
+    }
+    setText(`.cost-sc-val[data-row="${rIdx}"]`, fmt(costSC));
+    setText(`.cost-vat-val[data-row="${rIdx}"]`, fmt(costVAT));
+    setText(`.cost-head-val[data-row="${rIdx}"]`, fmt(perHead));
+  });
+  const memberTotals = state.members.map((m, cIdx) => {
+    return state.items.reduce((sum, item) => {
+      if(item.consumed[cIdx]) return sum + calcRow(item).perHead;
+      return sum;
+    }, 0);
+  });
+  setText(".total-base-val", fmt(totalBase));
+  setText(".total-discount-val", totalDiscount > 0.004 ? "-" + fmt(totalDiscount) : fmt(0));
+  const totalDiscEl = document.querySelector(".total-discount-val");
+  if(totalDiscEl) totalDiscEl.classList.toggle("has-discount", totalDiscount > 0.004);
+  setText(".total-sc-val", fmt(totalSC));
+  setText(".total-vat-val", fmt(totalVAT));
+  memberTotals.forEach((t, cIdx) => setText(`.member-total-val[data-idx="${cIdx}"]`, fmt(t)));
+  memberTotals.forEach((t, idx) => setText(`.summary-card[data-idx="${idx}"] .amount`, fmt(t)));
+  setText("#grandTotal", fmt(totalVAT));
+  const balances = state.members.map((m, idx) => round2(Number(state.paidAmounts[idx]||0) - memberTotals[idx]));
+  state.members.forEach((m, idx) => {
+    setText(`.paid-share-val[data-idx="${idx}"]`, fmt(memberTotals[idx]));
+    const b = balances[idx];
+    const balEl = document.querySelector(`.balance-val[data-idx="${idx}"]`);
+    if(balEl){
+      let cls = "zero", label = fmt(0);
+      if(b > 0.01){ cls = "positive"; label = "▲ " + fmt(b) + " (" + t("getsBack") + ")"; }
+      else if(b < -0.01){ cls = "negative"; label = "▼ " + fmt(Math.abs(b)) + " (" + t("owesLabel") + ")"; }
+      else { label = t("settledLabel"); }
+      balEl.className = "balance-val " + cls;
+      balEl.textContent = label;
+    }
+  });
+  renderSettlement(balances);
+  renderPaidCheck(totalVAT);
+  restoreFocus(focusInfo);
+  return { totalBase, totalDiscount, totalSC, totalVAT, memberTotals, balances };
+}
+// Verifies that the sum of everyone's "Paid Upfront" amounts actually
+// matches the Grand Total of the bill. If a Paid Upfront amount was
+// entered wrong (or forgotten for one person), the split-up math below
+// would silently be based on an incorrect total, so this surfaces a clear
+// warning instead of letting the discrepancy go unnoticed.
+function renderPaidCheck(grandTotal){
+  const box = document.getElementById("paidCheckBox");
+  if(!box) return;
+  const paidTotal = state.paidAmounts.reduce((s, v) => s + (Number(v)||0), 0);
+  const diff = round2(paidTotal - grandTotal);
+  if(Math.abs(diff) <= 0.01){
+    box.className = "paid-check ok";
+    box.innerHTML = `<span>${t("paidCheckOk")}</span>`;
+  } else if(diff < 0){
+    box.className = "paid-check mismatch";
+    box.innerHTML = `<span>${t("paidCheckShort")} ${fmt(paidTotal)} \u2014 ${fmt(Math.abs(diff))} ${t("paidCheckLess")}</span><span class="diff-amt">-${fmt(Math.abs(diff))}</span>`;
+  } else {
+    box.className = "paid-check mismatch";
+    box.innerHTML = `<span>${t("paidCheckShort")} ${fmt(paidTotal)} \u2014 ${fmt(diff)} ${t("paidCheckOver")}</span><span class="diff-amt">+${fmt(diff)}</span>`;
+  }
+}
+function setText(selector, text){
+  const el = document.querySelector(selector);
+  if(el) el.textContent = text;
+}
+function syncSettingsInputs(){
+  const sc = document.getElementById("scPercent");
+  const vat = document.getElementById("vatPercent");
+  const cur = document.getElementById("currencySymbol");
+  const rest = document.getElementById("restaurantName");
+  const dine = document.getElementById("diningDate");
+  if(sc && document.activeElement !== sc) sc.value = state.scPercent;
+  if(vat && document.activeElement !== vat) vat.value = state.vatPercent;
+  if(cur && document.activeElement !== cur) cur.value = state.currencySymbol;
+  if(rest && document.activeElement !== rest) rest.value = state.restaurantName || "";
+  if(dine && document.activeElement !== dine) dine.value = state.diningDate || "";
+}
+function computeTransactions(balances){
+  const creditors = [], debtors = [];
+  state.members.forEach((m, idx) => {
+    const b = round2(balances[idx]);
+    if(b > 0.01) creditors.push({ name: m, idx, amt: b });
+    else if(b < -0.01) debtors.push({ name: m, idx, amt: -b });
+  });
+  creditors.sort((a,b) => b.amt - a.amt);
+  debtors.sort((a,b) => b.amt - a.amt);
+  const transactions = [];
+  let ci = 0, di = 0;
+  while(ci < creditors.length && di < debtors.length){
+    const c = creditors[ci], d = debtors[di];
+    const amt = round2(Math.min(c.amt, d.amt));
+    if(amt > 0.01) transactions.push({ from: d.name, to: c.name, toIdx: c.idx, amount: amt });
+    c.amt = round2(c.amt - amt);
+    d.amt = round2(d.amt - amt);
+    if(c.amt <= 0.01) ci++;
+    if(d.amt <= 0.01) di++;
+  }
+  return transactions;
+}
+function bankOptionsHtml(selected){
+  let opts = `<option value=""${selected ? "" : " selected"}>${t("selectPaymentPlaceholder")}</option>`;
+  opts += `<optgroup label="${t("promptpayGroupLabel")}">`;
+  PAYMENT_METHODS.forEach(b => {
+    opts += `<option value="${escapeAttr(b)}"${b === selected ? " selected" : ""}>${escapeHtml(b)}</option>`;
+  });
+  opts += `</optgroup><optgroup label="${t("bankGroupLabel")}">`;
+  THAI_BANKS.forEach(b => {
+    opts += `<option value="${escapeAttr(b)}"${b === selected ? " selected" : ""}>${escapeHtml(b)}</option>`;
+  });
+  opts += `</optgroup>`;
+  return opts;
+}
+function isPromptPay(bankName){
+  return PAYMENT_METHODS.includes(bankName);
+}
+function renderSettlement(balances){
+  const listEl = document.getElementById("settleList");
+  if(!listEl) return;
+  const transactions = computeTransactions(balances);
+  if(transactions.length === 0){
+    listEl.innerHTML = `<div class="all-settled">${t("allSettled")}</div>`;
+    return;
+  }
+  listEl.innerHTML = transactions.map((tx, tIdx) => `
+    <div class="settle-row">
+      <div class="settle-top-line">
+        <span class="settle-from">${escapeHtml(tx.from)}</span>
+        <span class="settle-arrow">➣</span>
+        <span class="settle-to">${escapeHtml(tx.to)}</span>
+        <span class="settle-amount">${fmt(tx.amount)}</span>
+      </div>
+      <div class="settle-bank-row">
+        <label>${t("transferTo")} ${escapeHtml(tx.to)}:</label>
+        <select class="bank-select" data-idx="${tx.toIdx}">
+          ${bankOptionsHtml(state.bankNames[tx.toIdx] || "")}
+        </select>
+        <div class="acc-number-wrap">
+          <input type="text" class="acc-number-input" data-idx="${tx.toIdx}"
+                 placeholder="${isPromptPay(state.bankNames[tx.toIdx]) ? t('accPlaceholderPromptpay') : t('accPlaceholderBank')}"
+                 value="${escapeAttr(state.bankAccounts[tx.toIdx] || "")}">
+          <button type="button" class="copy-acc-btn" data-idx="${tx.toIdx}" title="${t('copyBtn')}">${t('copyBtn')}</button>
+        </div>
+      </div>
+    </div>
+  `).join("");
+  listEl.querySelectorAll(".bank-select").forEach(el => {
+    el.addEventListener("change", e => {
+      const idx = e.target.dataset.idx;
+      state.bankNames[idx] = e.target.value;
+      saveState();
+      const newPlaceholder = isPromptPay(e.target.value) ? t("accPlaceholderPromptpay") : t("accPlaceholderBank");
+      listEl.querySelectorAll(`.bank-select[data-idx="${idx}"]`).forEach(otherSel => {
+        if(otherSel !== e.target) otherSel.value = e.target.value;
+      });
+      listEl.querySelectorAll(`.acc-number-input[data-idx="${idx}"]`).forEach(inputEl => {
+        inputEl.placeholder = newPlaceholder;
+      });
+    });
+  });
+  listEl.querySelectorAll(".acc-number-input").forEach(el => {
+    el.addEventListener("input", e => {
+      const idx = e.target.dataset.idx;
+      state.bankAccounts[idx] = e.target.value;
+      saveState();
+      listEl.querySelectorAll(`.acc-number-input[data-idx="${idx}"]`).forEach(otherInput => {
+        if(otherInput !== e.target) otherInput.value = e.target.value;
+      });
+    });
+  });
+  listEl.querySelectorAll(".copy-acc-btn").forEach(el => {
+    el.addEventListener("click", e => {
+      const btn = e.currentTarget;
+      const idx = btn.dataset.idx;
+      const value = state.bankAccounts[idx] || "";
+      if(!value){
+        btn.textContent = t("noNumberBtn");
+        setTimeout(() => { btn.innerHTML = t("copyBtn"); }, 1200);
+        return;
+      }
+      const markCopied = () => {
+        btn.classList.add("copied");
+        btn.textContent = t("copiedBtn");
+        setTimeout(() => {
+          btn.classList.remove("copied");
+          btn.innerHTML = t("copyBtn");
+        }, 1200);
+      };
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(value).then(markCopied).catch(() => fallbackCopy(value, markCopied));
+      } else {
+        fallbackCopy(value, markCopied);
+      }
+    });
+  });
+}
+function fallbackCopy(text, onDone){
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try{ document.execCommand("copy"); }catch(e){}
+  document.body.removeChild(ta);
+  if(onDone) onDone();
+}
+function attachRowListeners(){
+  document.querySelectorAll(".item-name").forEach(el=>{
+    el.addEventListener("input", e=>{
+      state.items[e.target.dataset.row].name = e.target.value;
+      saveState();
+    });
+  });
+  document.querySelectorAll(".item-qty").forEach(el=>{
+    el.addEventListener("input", e=>{
+      state.items[e.target.dataset.row].qty = parseFloat(e.target.value) || 0;
+      saveState(); patchCalculations();
+    });
+  });
+  document.querySelectorAll(".item-cost").forEach(el=>{
+    el.addEventListener("input", e=>{
+      state.items[e.target.dataset.row].cost = parseFloat(e.target.value) || 0;
+      saveState(); patchCalculations();
+    });
+  });
+  document.querySelectorAll(".item-disc-value").forEach(el=>{
+    el.addEventListener("input", e=>{
+      state.items[e.target.dataset.row].discountValue = Math.max(0, parseFloat(e.target.value) || 0);
+      saveState(); patchCalculations();
+    });
+  });
+  document.querySelectorAll(".item-disc-type").forEach(el=>{
+    el.addEventListener("change", e=>{
+      state.items[e.target.dataset.row].discountType = e.target.value;
+      saveState(); patchCalculations();
+    });
+  });
+  document.querySelectorAll(".consume-check").forEach(el=>{
+    el.addEventListener("change", e=>{
+      const r = e.target.dataset.row, c = e.target.dataset.col;
+      state.items[r].consumed[c] = e.target.checked;
+      saveState(); patchCalculations();
+    });
+  });
+  document.querySelectorAll(".remove-item-btn").forEach(el=>{
+    el.addEventListener("click", e=>{
+      const r = Number(e.currentTarget.dataset.row);
+      state.items.splice(r,1);
+      saveState(); render();
+    });
+  });
+  document.querySelectorAll(".member-name-input").forEach(el=>{
+    el.addEventListener("input", e=>{
+      const idx = e.target.dataset.idx;
+      state.members[idx] = e.target.value;
+      saveState();
+      setText(`.summary-card[data-idx="${idx}"] .name`, e.target.value);
+      const paidRow = document.querySelector(`.paid-amount[data-idx="${idx}"]`);
+      if(paidRow){
+        const nameCell = paidRow.closest("tr").querySelector("strong");
+        if(nameCell) nameCell.textContent = e.target.value;
+      }
+    });
+  });
+  document.querySelectorAll(".remove-member-btn").forEach(el=>{
+    el.addEventListener("click", e=>{
+      const idx = Number(e.currentTarget.dataset.idx);
+      state.members.splice(idx,1);
+      state.paid.splice(idx,1);
+      state.paidAmounts.splice(idx,1);
+      state.bankNames.splice(idx,1);
+      state.bankAccounts.splice(idx,1);
+      state.items.forEach(item => item.consumed.splice(idx,1));
+      saveState(); render();
+    });
+  });
+  document.querySelectorAll(".status").forEach(el=>{
+    el.addEventListener("click", e=>{
+      const idx = Number(e.currentTarget.dataset.idx);
+      state.paid[idx] = !state.paid[idx];
+      saveState(); render();
+    });
+  });
+  document.querySelectorAll(".paid-amount").forEach(el=>{
+    el.addEventListener("input", e=>{
+      const idx = e.target.dataset.idx;
+      state.paidAmounts[idx] = parseFloat(e.target.value) || 0;
+      saveState(); patchCalculations();
+    });
+  });
+}
+document.getElementById("scPercent").addEventListener("input", e=>{
+  state.scPercent = parseFloat(e.target.value) || 0;
+  saveState(); patchCalculations();
+});
+document.getElementById("vatPercent").addEventListener("input", e=>{
+  state.vatPercent = parseFloat(e.target.value) || 0;
+  saveState(); patchCalculations();
+});
+document.getElementById("currencySymbol").addEventListener("input", e=>{
+  state.currencySymbol = e.target.value || "";
+  saveState(); patchCalculations();
+});
+document.getElementById("restaurantName").addEventListener("input", e=>{
+  state.restaurantName = e.target.value || "";
+  saveState();
+});
+document.getElementById("diningDate").addEventListener("change", e=>{
+  state.diningDate = e.target.value || "";
+  saveState();
+});
+document.getElementById("addItemBtn").addEventListener("click", ()=>{
+  state.items.push({
+    name: t("newItemName"),
+    qty: 1,
+    cost: 0,
+    discountType: "percent",
+    discountValue: 0,
+    consumed: state.members.map(()=>false)
+  });
+  saveState(); render();
+});
+document.getElementById("addMemberBtn").addEventListener("click", ()=>{
+  const name = t("newPersonPrefix") + " " + (state.members.length + 1);
+  state.members.push(name);
+  state.paid.push(false);
+  state.paidAmounts.push(0);
+  state.bankNames.push("");
+  state.bankAccounts.push("");
+  state.items.forEach(item => item.consumed.push(false));
+  saveState(); render();
+});
+function buildViewOnlySnapshot(){
+  const calc = state.items.map(item => calcRow(item));
+  const totalBase = state.items.reduce((s,i)=>s+Number(i.cost||0),0);
+  const totalDiscount = calc.reduce((s,c)=>s+c.discount,0);
+  const totalSC = calc.reduce((s,c)=>s+c.costSC,0);
+  const totalVAT = calc.reduce((s,c)=>s+c.costVAT,0);
+  const memberTotals = state.members.map((m, cIdx) =>
+    state.items.reduce((sum, item, rIdx) => item.consumed[cIdx] ? sum + calc[rIdx].perHead : sum, 0)
+  );
+  const balances = state.members.map((m, idx) => round2(Number(state.paidAmounts[idx]||0) - memberTotals[idx]));
+  const memberHeaderCells = state.members.map(m => `<th class="member-col">${escapeHtml(m)}</th>`).join("");
+  // Same as the live dashboard: if nobody has any discount on any item,
+  // drop the whole Discount column from the exported snapshot entirely
+  // (header + every row + the footer total cell) instead of showing a
+  // column of dashes that just eats up space.
+  const hasAnyDiscount = totalDiscount > 0.004;
+  const discountHeaderCell = hasAnyDiscount ? `<th>${t("thDiscount")}</th>` : "";
+  const rowsHtml = state.items.map((item, rIdx) => {
+    const { discount, costSC, costVAT, perHead } = calc[rIdx];
+    const memberCells = state.members.map((m, cIdx) =>
+      `<td class="member-col">${item.consumed[cIdx] ? "✅" : "—"}</td>`
+    ).join("");
+    let discountCell = "";
+    if(hasAnyDiscount){
+      let discountLabel = "—";
+      if(discount > 0.004){
+        const typeLabel = item.discountType === "amount" ? "Fixed" : (Number(item.discountValue||0) + "%");
+        discountLabel = "-" + fmt(discount) + ` (${typeLabel})`;
+      }
+      discountCell = `<td${discount > 0.004 ? ' style="color:#e0433d;font-weight:600;"' : ""}>${discountLabel}</td>`;
+    }
+    return `<tr>
+      <td>${escapeHtml(item.name)}</td>
+      <td>${item.qty}</td>
+      <td>${fmt(item.cost)}</td>
+      ${discountCell}
+      <td>${fmt(costSC)}</td>
+      <td>${fmt(costVAT)}</td>
+      ${memberCells}
+      <td>${fmt(perHead)}</td>
+    </tr>`;
+  }).join("");
+  // Unlike the old PDF export, this view-only snapshot keeps the table's
+  // normal on-screen behavior (horizontal scroll on narrow screens via
+  // .table-scroll{overflow-x:auto} + table{min-width:780px}) instead of
+  // forcibly shrinking everything to fit a fixed printed page — so with
+  // many people the table simply scrolls sideways exactly like the live
+  // dashboard already does, rather than cramming numbers into narrow
+  // columns until they overlap and become unreadable.
+  const memberTotalCells = memberTotals.map(mt => `<td class="member-col">${fmt(mt)}</td>`).join("");
+  const summaryCardsHtml = state.members.map((m, idx) => {
+    const paid = !!state.paid[idx];
+    return `<div class="summary-card">
+      <div class="name">${escapeHtml(m)}</div>
+      <div class="amount">${fmt(memberTotals[idx])}</div>
+      <div class="status ${paid ? "paid" : "unpaid"}">${paid ? t("paidStatus") : t("notPaidStatus")}</div>
+    </div>`;
+  }).join("");
+  const paidRowsHtml = state.members.map((m, idx) => {
+    const b = balances[idx];
+    let cls = "zero", label = t("settledLabel");
+    if(b > 0.01){ cls = "positive"; label = "▲ " + fmt(b) + " (" + t("getsBack") + ")"; }
+    else if(b < -0.01){ cls = "negative"; label = "▼ " + fmt(Math.abs(b)) + " (" + t("owesLabel") + ")"; }
+    return `<tr>
+      <td><strong>${escapeHtml(m)}</strong></td>
+      <td>${fmt(state.paidAmounts[idx]||0)}</td>
+      <td>${fmt(memberTotals[idx])}</td>
+      <td><span class="balance-val ${cls}">${label}</span></td>
+    </tr>`;
+  }).join("");
+  const transactions = computeTransactions(balances);
+  const settleHtml = transactions.length === 0
+    ? `<div class="all-settled">${t("allSettled")}</div>`
+    : transactions.map((tx) => {
+        const bankName = state.bankNames[tx.toIdx] || "";
+        const bankAcc = state.bankAccounts[tx.toIdx] || "";
+        const bankLine = (bankName || bankAcc)
+          ? `<div class="settle-bank-row">
+              <label>${t("transferTo")} ${escapeHtml(tx.to)}:</label>
+              <span>${escapeHtml(bankName || "—")}</span>
+              <span>${escapeHtml(bankAcc || "—")}</span>
+            </div>`
+          : "";
+        return `<div class="settle-row">
+          <div class="settle-top-line">
+            <span class="settle-from">${escapeHtml(tx.from)}</span>
+            <span class="settle-arrow">➣</span>
+            <span class="settle-to">${escapeHtml(tx.to)}</span>
+            <span class="settle-amount">${fmt(tx.amount)}</span>
+          </div>
+          ${bankLine}
+        </div>`;
+      }).join("");
+  const paidTotal = state.paidAmounts.reduce((s, v) => s + (Number(v)||0), 0);
+  const paidDiff = round2(paidTotal - totalVAT);
+  let paidCheckHtml;
+  if(Math.abs(paidDiff) <= 0.01){
+    paidCheckHtml = `<div class="paid-check ok"><span>${t("paidCheckOk")}</span></div>`;
+  } else if(paidDiff < 0){
+    paidCheckHtml = `<div class="paid-check mismatch"><span>${t("paidCheckShort")} ${fmt(paidTotal)} — ${fmt(Math.abs(paidDiff))} ${t("paidCheckLess")}</span><span class="diff-amt">-${fmt(Math.abs(paidDiff))}</span></div>`;
+  } else {
+    paidCheckHtml = `<div class="paid-check mismatch"><span>${t("paidCheckShort")} ${fmt(paidTotal)} — ${fmt(paidDiff)} ${t("paidCheckOver")}</span><span class="diff-amt">+${fmt(paidDiff)}</span></div>`;
+  }
+  const styleBlock = document.querySelector("style").outerHTML;
+  const generatedLine = t("generatedOn") + " " + new Date().toLocaleString();
+  return `<!DOCTYPE html>
+<html lang="${lang}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${t("printTitle")}</title>
+${styleBlock}
+</head>
+<body>
+<div class="wrap view-only">
+  <header class="top">
+    <div>
+      <h1>🧾 SplitEase</h1>
+      <p>${t("printTitle")}</p>
+    </div>
+  </header>
+  <div class="view-only-banner">${t("viewOnlyBanner")}</div>
+  <div class="card">
+    <h2>${t("chargesHeader")}</h2>
+    <div class="settings-row">
+      <div class="field"><label>${t("serviceCharge")}</label><div style="padding:8px 0;font-weight:600;">${state.scPercent}%</div></div>
+      <div class="field"><label>${t("vatLabel")}</label><div style="padding:8px 0;font-weight:600;">${state.vatPercent}%</div></div>
+      <div class="field"><label>${t("thDiscount")}</label><div style="padding:8px 0;font-weight:600;${totalDiscount > 0.004 ? " color:#e0433d;" : ""}">${totalDiscount > 0.004 ? "-" + fmt(totalDiscount) : fmt(0)}</div></div>
+      <div class="field"><label>${t("currencySymbol")}</label><div style="padding:8px 0;font-weight:600;">${escapeHtml(state.currencySymbol)}</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h2>${t("menuHeader")}</h2>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>${t("thMenu")}</th><th>${t("thQty")}</th><th>${t("thCostExcl")}</th>${discountHeaderCell}<th>${t("thCostSC")}</th><th>${t("thCostVAT")}</th>
+            ${memberHeaderCells}
+            <th>${t("thCostHead")}</th>
+          </tr>
+        </thead>
+        <tbody>${rowsHtml}</tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2">${t("totalAmountLabel")}</td>
+            <td>${fmt(totalBase)}</td>${hasAnyDiscount ? `<td style="color:#e0433d;">-${fmt(totalDiscount)}</td>` : ""}<td>${fmt(totalSC)}</td><td>${fmt(totalVAT)}</td>
+            ${memberTotalCells}
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <h2>${t("whoOwesHeader")}</h2>
+    <div class="summary-grid">${summaryCardsHtml}</div>
+    <div class="grand-total"><span>${t("grandTotalLabel")}</span><b>${fmt(totalVAT)}</b></div>
+  </div>
+  <div class="card">
+    <h2>${t("whoPaidHeader")}</h2>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>${t("thPerson")}</th><th>${t("thAmountPaid")}</th><th>${t("thTheirShare")}</th><th>${t("thBalance")}</th></tr></thead>
+        <tbody>${paidRowsHtml}</tbody>
+      </table>
+    </div>
+    ${paidCheckHtml}
+  </div>
+  <div class="card">
+    <h2>${t("settleHeader")}</h2>
+    <div>${settleHtml}</div>
+  </div>
+  <footer>${generatedLine}</footer>
+</div>
+</body>
+</html>`;
+}
+function shareViewOnly(){
+  const html = buildViewOnlySnapshot();
+  const blob = new Blob([html], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "SplitEase (View Only).html";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+document.getElementById("shareViewBtn").addEventListener("click", shareViewOnly);
+// Builds a plain-text summary of the whole bill, formatted with emoji
+// section headers and a simple vertical bullet-list layout (never a
+// table). Unlike the PDF export, this has NO width constraint at all
+// — adding a 20th person just adds one more line, so it never gets
+// cramped or cut off no matter how large the group is. Designed to be
+// pasted directly into LINE, WhatsApp, Messenger, or any chat app as a
+// normal text message, so friends can read it instantly without needing
+// to open/download any file at all.
+function buildTextSummary(){
+  const calc = state.items.map(item => calcRow(item));
+  const totalVAT = calc.reduce((s,c)=>s+c.costVAT,0);
+  const memberTotals = state.members.map((m, cIdx) =>
+    state.items.reduce((sum, item, rIdx) => item.consumed[cIdx] ? sum + calc[rIdx].perHead : sum, 0)
+  );
+  const balances = state.members.map((m, idx) => round2(Number(state.paidAmounts[idx]||0) - memberTotals[idx]));
+  const paidTotal = state.paidAmounts.reduce((s, v) => s + (Number(v)||0), 0);
+  const paidDiff = round2(paidTotal - totalVAT);
+  const lines = [];
+  // Line 1: just the product name (brand), not the localized "SplitEase
+  // Summary" title — the summary itself is the body of the message, so
+  // a plain product-name line reads more like a signature/header than a
+  // repeated "Summary" label.
+  lines.push("🧾 SplitEase");
+  // Line 2: the restaurant/shop name (if the user filled it in). Always
+  // emit this line (even if blank) so the summary always has a
+  // predictable 3-line header block: brand, place, date.
+  lines.push("📍 " + (state.restaurantName || ""));
+  // Line 3: the date the group actually dined together (state.diningDate,
+  // set via the new "Date" field), NOT the date this Copy Summary button
+  // happens to be pressed — those two can easily differ if someone
+  // shares the bill a few days after the meal.
+  let dateLine;
+  if(state.diningDate){
+    const parts = state.diningDate.split("-");
+    if(parts.length === 3){
+      const d = new Date(Number(parts[0]), Number(parts[1])-1, Number(parts[2]));
+      dateLine = d.toLocaleDateString(lang === "th" ? "th-TH" : undefined, { day:"2-digit", month:"short", year:"numeric" });
+    } else {
+      dateLine = state.diningDate;
+    }
+  } else {
+    dateLine = new Date().toLocaleDateString();
+  }
+  lines.push("📅 " + dateLine);
+  lines.push("");
+  lines.push("💰 " + t("summaryGrandTotal") + ": " + fmt(totalVAT));
+  lines.push("");
+  lines.push("👥 " + t("summaryWhoOwes") + ":");
+  state.members.forEach((m, idx) => {
+    const paid = !!state.paid[idx];
+    const statusEmoji = paid ? t("paidStatus") : t("notPaidStatus");
+    lines.push("• " + m + ": " + fmt(memberTotals[idx]) + " " + statusEmoji);
+  });
+  lines.push("");
+  const transactions = computeTransactions(balances);
+  lines.push("🔄 " + t("summarySettleUp") + ":");
+  if(transactions.length === 0){
+    lines.push(t("allSettled"));
+  } else {
+    transactions.forEach(tx => {
+      let line = tx.from + " ➣ " + tx.to + ": " + fmt(tx.amount);
+      const bankName = state.bankNames[tx.toIdx] || "";
+      const bankAcc = state.bankAccounts[tx.toIdx] || "";
+      if(bankName || bankAcc){
+        line += "\n   " + t("summaryBank") + ": " + [bankName, bankAcc].filter(Boolean).join(" ");
+      }
+      lines.push(line);
+    });
+  }
+  lines.push("");
+  if(Math.abs(paidDiff) <= 0.01){
+    lines.push(t("paidCheckOk"));
+  } else if(paidDiff < 0){
+    lines.push(t("paidCheckShort") + " " + fmt(paidTotal) + " — " + fmt(Math.abs(paidDiff)) + " " + t("paidCheckLess"));
+  } else {
+    lines.push(t("paidCheckShort") + " " + fmt(paidTotal) + " — " + fmt(paidDiff) + " " + t("paidCheckOver"));
+  }
+  return lines.join("\n");
+}
+function copySummaryText(){
+  const text = buildTextSummary();
+  const done = () => showToast(t("copiedSummaryToast"));
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+function showToast(msg){
+  let toastEl = document.getElementById("summaryToast");
+  if(!toastEl){
+    toastEl = document.createElement("div");
+    toastEl.id = "summaryToast";
+    toastEl.style.cssText = "position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;padding:11px 20px;border-radius:9px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 14px rgba(0,0,0,.2);";
+    document.body.appendChild(toastEl);
+  }
+  toastEl.textContent = msg;
+  toastEl.style.opacity = "1";
+  clearTimeout(toastEl._hideTimer);
+  toastEl._hideTimer = setTimeout(() => { toastEl.style.opacity = "0"; }, 2500);
+}
+document.getElementById("copySummaryBtn").addEventListener("click", copySummaryText);
+document.getElementById("resetBtn").addEventListener("click", ()=>{
+  if(confirm(t("resetConfirm"))){
+    state = buildSample();
+    normalizeState();
+    saveState(); render();
+  }
+});
+document.getElementById("clearBtn").addEventListener("click", ()=>{
+  if(confirm(t("clearConfirm"))){
+    state = { scPercent: state.scPercent, vatPercent: state.vatPercent, currencySymbol: state.currencySymbol, restaurantName: "", diningDate: "", members: [], items: [], paid: [], paidAmounts: [], bankNames: [], bankAccounts: [] };
+    saveState(); render();
+  }
+});
+function applyStaticTranslations(){
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    el.textContent = t(key);
+  });
+  // Placeholder text (e.g. the Restaurant Name field's "e.g. Regency
+  // Restaurant" hint) lives in an attribute, not the element's visible
+  // text content, so it needs its own translation pass separate from the
+  // data-i18n loop above.
+  document.querySelectorAll("[data-i18n-placeholder]").forEach(el => {
+    const key = el.getAttribute("data-i18n-placeholder");
+    el.setAttribute("placeholder", t(key));
+  });
+}
+const langBtnEl = document.getElementById("langBtn");
+if(langBtnEl){
+  langBtnEl.addEventListener("click", () => {
+    lang = lang === "en" ? "th" : "en";
+    localStorage.setItem(LANG_KEY, lang);
+    applyStaticTranslations();
+    render();
+  });
+}
+applyStaticTranslations();
 render();
 </script>
 </body>
